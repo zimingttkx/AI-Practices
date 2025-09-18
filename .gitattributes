@@ -1,0 +1,2 @@
+*.h5 filter=lfs diff=lfs merge=lfs -text
+glove.840B.300d.txt filter=lfs diff=lfs merge=lfs -text
