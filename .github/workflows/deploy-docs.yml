@@ -48,7 +48,7 @@ jobs:
           NODE_OPTIONS: --max_old_space_size=4096
 
       - name: Upload build artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: docs/.vitepress/dist
 
