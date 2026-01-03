@@ -41,7 +41,7 @@
 --------
     pip install torch>=1.9.0 gymnasium>=0.26.0 numpy matplotlib
 
-Author: Reinforcement Learning Research Group
+Author: zimingttkx
 Date: 2024
 """
 

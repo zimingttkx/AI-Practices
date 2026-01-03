@@ -171,7 +171,7 @@ Dependencies
 ============================================================
     pip install torch numpy gymnasium matplotlib
 
-Author: AI-Practices Contributors
+Author: zimingttkx
 License: MIT
 """
 

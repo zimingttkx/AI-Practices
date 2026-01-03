@@ -64,7 +64,7 @@ References
     learning. Nature.
 [2] OpenAI Spinning Up: Deep RL course implementation guidelines.
 
-Author: AI-Practices Contributors
+Author: zimingttkx
 License: MIT
 """
 

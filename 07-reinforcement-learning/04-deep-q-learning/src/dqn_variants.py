@@ -351,7 +351,7 @@ Compare variants:
     results = compare_variants(env_name="CartPole-v1", num_episodes=300)
     plot_comparison(results)
 
-Author: AI-Practices Contributors
+Author: zimingttkx
 License: MIT
 Version: 2.0.0
 """
