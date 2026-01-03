@@ -7,8 +7,6 @@
     - 类型验证测试
     - 状态一致性测试
 
-作者: AI-Practices
-许可证: MIT
 """
 
 import pytest

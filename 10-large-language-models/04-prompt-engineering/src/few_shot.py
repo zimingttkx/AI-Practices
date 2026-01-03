@@ -8,8 +8,6 @@ Few-shot 学习实现
     - ExampleSelector: 示例选择器基类
     - FewShotPrompt: Few-shot 提示构建器
 
-作者: 研究级实现
-许可证: MIT
 """
 
 from __future__ import annotations

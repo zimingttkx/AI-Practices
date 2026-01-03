@@ -9,8 +9,6 @@
     - PromptLibrary: 预定义模板库
     - OutputParser: 输出解析器
 
-作者: 研究级实现
-许可证: MIT
 """
 
 from __future__ import annotations

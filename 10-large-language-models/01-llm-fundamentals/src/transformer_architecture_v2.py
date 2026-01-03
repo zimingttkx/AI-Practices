@@ -10,8 +10,6 @@ Transformer 架构实现
     - 逐位置前馈网络
     - Transformer 编码器/解码器层
 
-作者: 研究级实现
-许可证: MIT
 """
 
 from __future__ import annotations

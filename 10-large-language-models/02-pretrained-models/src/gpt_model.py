@@ -9,8 +9,6 @@ GPT 模型架构实现
     - GPT Block (Pre-LN Transformer Decoder)
     - GPT 语言模型
 
-作者: 研究级实现
-许可证: MIT
 """
 
 from __future__ import annotations

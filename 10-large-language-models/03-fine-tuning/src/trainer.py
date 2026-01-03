@@ -8,8 +8,6 @@
     - 混合精度训练
     - 学习率调度
 
-作者: 研究级实现
-许可证: MIT
 """
 
 from __future__ import annotations

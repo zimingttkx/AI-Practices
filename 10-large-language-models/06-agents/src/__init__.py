@@ -10,8 +10,6 @@ AI Agent 模块
     - Memory: 对话记忆管理
     - Agent: Agent核心实现
 
-作者: AI-Practices
-许可证: MIT
 """
 
 from .tools import (

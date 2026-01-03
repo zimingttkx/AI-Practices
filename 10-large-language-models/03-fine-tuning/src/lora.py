@@ -9,8 +9,6 @@ LoRA (Low-Rank Adaptation) 实现
     - LoRALinear: LoRA线性层
     - apply_lora_to_model: 将LoRA应用到模型
 
-作者: 研究级实现
-许可证: MIT
 """
 
 from __future__ import annotations

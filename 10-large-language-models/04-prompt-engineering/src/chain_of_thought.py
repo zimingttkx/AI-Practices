@@ -9,8 +9,6 @@ Chain-of-Thought (CoT) 推理实现
     - SelfConsistency: 自洽性推理
     - TreeOfThought: 思维树推理
 
-作者: 研究级实现
-许可证: MIT
 """
 
 from __future__ import annotations

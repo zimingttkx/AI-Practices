@@ -10,8 +10,6 @@ LLaMA 模型架构实现
     - SwiGLU 激活函数
     - 分组查询注意力 (GQA)
 
-作者: 研究级实现
-许可证: MIT
 """
 
 from __future__ import annotations

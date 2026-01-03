@@ -88,8 +88,6 @@
     - VectorStore: 向量存储基类 (抽象接口)
     - SimpleVectorStore: 简单向量存储 (内存实现)
 
-作者: AI-Practices
-许可证: MIT
 """
 
 from __future__ import annotations

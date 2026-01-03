@@ -8,8 +8,6 @@
     - ToolRegistry注册管理
     - 内置工具功能测试
 
-作者: AI-Practices
-许可证: MIT
 """
 
 import pytest

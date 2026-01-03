@@ -8,8 +8,6 @@ prompt_templates 模块单元测试
     - PromptLibrary 类
     - OutputParser 类及其子类
 
-作者: 研究级实现
-许可证: MIT
 """
 
 from __future__ import annotations

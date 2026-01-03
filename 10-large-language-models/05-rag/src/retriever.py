@@ -108,8 +108,6 @@ dense_results  sparse_results  final_results
     - SparseRetriever: 稀疏检索器 (BM25)
     - HybridRetriever: 混合检索器 (RRF/加权融合)
 
-作者: AI-Practices
-许可证: MIT
 """
 
 from __future__ import annotations

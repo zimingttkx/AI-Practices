@@ -9,8 +9,6 @@
     - FewShotPrompt: Few-shot 提示构建器
     - CoTPrompt: Chain-of-Thought 提示构建器
 
-作者: 研究级实现
-许可证: MIT
 """
 
 from .chain_of_thought import (

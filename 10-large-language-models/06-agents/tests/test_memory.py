@@ -9,8 +9,6 @@
     - SummaryMemory摘要记忆
     - VectorMemory向量记忆
 
-作者: AI-Practices
-许可证: MIT
 """
 
 import pytest

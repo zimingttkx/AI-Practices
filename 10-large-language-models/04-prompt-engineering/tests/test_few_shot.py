@@ -7,8 +7,6 @@ few_shot 模块单元测试
     - FewShotPrompt 类
     - FewShotTemplates 类
 
-作者: 研究级实现
-许可证: MIT
 """
 
 from __future__ import annotations

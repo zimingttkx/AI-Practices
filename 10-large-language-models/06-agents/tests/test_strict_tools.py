@@ -8,8 +8,6 @@
     - 安全性测试
     - 并发测试
 
-作者: AI-Practices
-许可证: MIT
 """
 
 import pytest

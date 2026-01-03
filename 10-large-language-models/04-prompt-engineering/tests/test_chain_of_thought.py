@@ -8,8 +8,6 @@ chain_of_thought 模块单元测试
     - TreeOfThought 类
     - CoTExamples 类
 
-作者: 研究级实现
-许可证: MIT
 """
 
 from __future__ import annotations

@@ -10,8 +10,6 @@ RAG (Retrieval-Augmented Generation) 模块
     - Retriever: 文档检索器 (稠密/稀疏/混合)
     - RAGPipeline: RAG流水线 (基础/高级)
 
-作者: AI-Practices
-许可证: MIT
 """
 
 from __future__ import annotations

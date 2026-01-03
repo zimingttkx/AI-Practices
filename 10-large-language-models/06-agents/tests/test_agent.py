@@ -10,8 +10,6 @@ Agent模块单元测试 (Agent Module Unit Tests)
     - ToolCallingAgent实现
     - PlanAndExecuteAgent实现
 
-作者: AI-Practices
-许可证: MIT
 """
 
 import pytest

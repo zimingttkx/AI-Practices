@@ -118,8 +118,6 @@ dense_vec    sparse_vec   hybrid_vec
     - SparseEmbedding: 稀疏向量嵌入 (基于BM25)
     - HybridEmbedding: 混合嵌入 (稠密+稀疏融合)
 
-作者: AI-Practices
-许可证: MIT
 """
 
 from __future__ import annotations

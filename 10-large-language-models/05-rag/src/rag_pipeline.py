@@ -106,8 +106,6 @@ RAG流水线是端到端的检索增强生成框架，协调以下组件：
     - RAGPipeline: 基础RAG流水线
     - AdvancedRAGPipeline: 高级RAG流水线 (查询重写/多轮检索)
 
-作者: AI-Practices
-许可证: MIT
 """
 
 from __future__ import annotations
