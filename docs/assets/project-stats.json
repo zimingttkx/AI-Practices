@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-02T04:24:21.235500",
+  "timestamp": "2026-01-03T10:29:13.131891",
   "modules": {
     "01-foundations": {
       "notebooks": 42,
@@ -39,9 +39,9 @@
     },
     "07-reinforcement-learning": {
       "notebooks": 23,
-      "python_files": 176,
+      "python_files": 175,
       "markdown_files": 28,
-      "lines_of_code": 66788
+      "lines_of_code": 66631
     },
     "08-theory-notes": {
       "notebooks": 4,
@@ -53,13 +53,13 @@
       "notebooks": 66,
       "python_files": 246,
       "markdown_files": 45,
-      "lines_of_code": 71804
+      "lines_of_code": 71801
     }
   },
   "totals": {
     "notebooks": 228,
-    "python_files": 422,
+    "python_files": 421,
     "markdown_files": 113,
-    "lines_of_code": 138592
+    "lines_of_code": 138432
   }
 }
