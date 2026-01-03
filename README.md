@@ -29,7 +29,7 @@
 
 <div align="center">
 
-| 📚 **219+ Notebooks** | 🧩 **9大核心模块** | 📝 **480+ Python文件** | 💻 **173k+ 代码行** | 🏆 **2枚Kaggle金牌** |
+| 📚 **250+ Notebooks** | 🧩 **12大核心模块** | 📝 **600+ Python文件** | 💻 **200k+ 代码行** | 🏆 **2枚Kaggle金牌** |
 |:---------------------:|:------------------:|:----------------------:|:-------------------:|:--------------------:|
 | 可复现实验 | 系统化学习路径 | 生产级代码 | 深度覆盖 | 竞赛验证 |
 
@@ -66,9 +66,12 @@
 | II | **04-序列模型** | RNN/LSTM、Attention、Transformer | 40+ |
 | III | **05-高级专题** | 分布式训练、模型压缩、部署优化 | 30+ |
 | III | **06-生成模型** | VAE、GAN、Diffusion Models | 35+ |
-| III | **07-强化学习** | DQN、PPO、SAC、Actor-Critic | 542+ |
-| IV | **09-实战项目** | Kaggle竞赛、游戏AI、股票交易 | 566+ |
+| III | **07-强化学习** | DQN、PPO、SAC、Actor-Critic | 80+ |
+| IV | **09-实战项目** | Kaggle竞赛、游戏AI、股票交易 | 100+ |
 | - | **08-理论笔记** | 激活函数、损失函数、架构选型速查 | 16+ |
+| V | **10-大语言模型** | Transformer、GPT/LLaMA、LoRA微调、RAG、Agent | 60+ |
+| V | **11-多模态学习** | CLIP、Stable Diffusion、Whisper、TTS | 47+ |
+| V | **12-部署优化** | 量化剪枝、TensorRT、FastAPI、MLOps | 50+ |
 
 <details>
 <summary><b>📂 展开完整目录结构</b></summary>
@@ -91,19 +94,42 @@ AI-Practices/
 │   ├── 03-custom-models-training/  # 自定义层和训练循环
 │   └── 04-data-loading-preprocessing/
 │
-├── 07-reinforcement-learning/      # 强化学习 (542+ 文件)
+├── 07-reinforcement-learning/      # 强化学习
 │   ├── 01-mdp-basics/              # 马尔可夫决策过程
-│   ├── 02-q-learning/              # 值迭代、策略迭代
-│   ├── 03-deep-q-learning/         # DQN、Double DQN
-│   └── 04-policy-gradient/         # REINFORCE、PPO、A3C
+│   ├── 02-temporal-difference/     # TD学习
+│   ├── 03-q-learning/              # Q-Learning
+│   ├── 04-deep-q-learning/         # DQN、Double DQN
+│   ├── 05-policy-gradient/         # REINFORCE、PPO
+│   ├── 06-actor-critic/            # A2C、A3C
+│   └── 07-advanced-algorithms/     # SAC、TD3
 │
-└── 09-practical-projects/          # 实战项目 (566+ 文件)
-    ├── 01-ml-basics/               # Titanic、Otto
-    ├── 02-computer-vision/         # MNIST CNN
-    ├── 03-nlp/                     # 情感分析、NER
-    ├── 04-time-series/             # 温度预测
-    ├── 05-kaggle-competitions/     # 金牌方案
-    └── 06-reinforcement-learning/  # 游戏AI、股票交易
+├── 09-practical-projects/          # 实战项目
+│   ├── 01-ml-basics/               # Titanic、Otto
+│   ├── 02-computer-vision/         # MNIST CNN
+│   ├── 03-nlp/                     # 情感分析、NER
+│   ├── 04-time-series/             # 温度预测
+│   ├── 05-kaggle-competitions/     # 金牌方案
+│   └── 06-reinforcement-learning/  # 游戏AI、股票交易
+│
+├── 10-large-language-models/       # 大语言模型
+│   ├── 01-llm-fundamentals/        # Transformer架构
+│   ├── 02-pretrained-models/       # GPT、LLaMA实现
+│   ├── 03-fine-tuning/             # LoRA、QLoRA微调
+│   ├── 04-prompt-engineering/      # 提示工程
+│   ├── 05-rag/                     # 检索增强生成
+│   ├── 06-agents/                  # Agent系统
+│   └── 07-alignment/               # RLHF、DPO对齐
+│
+├── 11-multimodal-learning/         # 多模态学习
+│   ├── 01-vision-language/         # CLIP、BLIP、LLaVA
+│   ├── 02-image-generation/        # VAE、Diffusion、ControlNet
+│   └── 03-audio-models/            # Whisper、TTS
+│
+└── 12-deployment-optimization/     # 部署优化
+    ├── 01-model-optimization/      # 量化、剪枝、蒸馏
+    ├── 02-inference-engines/       # TensorRT、vLLM
+    ├── 03-serving-systems/         # FastAPI、gRPC
+    └── 04-mlops/                   # 实验追踪、监控
 ```
 
 </details>
@@ -181,6 +207,35 @@ $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)
 **Bellman最优方程**:
 
 $$Q^*(s, a) = \mathbb{E}\left[r + \gamma \max_{a'} Q^*(s', a') \mid s, a\right]$$
+
+### 大语言模型
+
+| 领域 | 技术 | 应用 |
+|:-----|:-----|:-----|
+| **模型架构** | Transformer、GPT、LLaMA | 文本生成、对话系统 |
+| **高效微调** | LoRA、QLoRA、Adapter | 低资源微调 |
+| **提示工程** | Few-shot、CoT、ReAct | 任务引导 |
+| **检索增强** | RAG、向量数据库 | 知识问答 |
+| **Agent系统** | 工具调用、记忆管理 | 自主任务执行 |
+| **对齐训练** | RLHF、DPO | 安全对齐 |
+
+### 多模态学习
+
+| 领域 | 模型 | 应用 |
+|:-----|:-----|:-----|
+| **视觉-语言** | CLIP、BLIP、LLaVA | 图文理解、VQA |
+| **图像生成** | VAE、Diffusion、ControlNet | 文生图、图像编辑 |
+| **语音识别** | Whisper | 多语言ASR |
+| **语音合成** | Tacotron、HiFi-GAN | 文本转语音 |
+
+### 部署优化
+
+| 领域 | 技术 | 说明 |
+|:-----|:-----|:-----|
+| **模型优化** | 量化、剪枝、蒸馏 | 模型压缩 |
+| **推理引擎** | TensorRT、vLLM、Triton | 高性能推理 |
+| **服务系统** | FastAPI、gRPC | API服务 |
+| **MLOps** | 实验追踪、模型注册、监控 | 生产运维 |
 
 ---
 

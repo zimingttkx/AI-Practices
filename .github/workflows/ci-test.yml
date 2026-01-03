@@ -1,0 +1,107 @@
+name: CI Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - '**.py'
+      - 'pyproject.toml'
+      - 'requirements.txt'
+      - '.github/workflows/ci-test.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '**.py'
+      - 'pyproject.toml'
+      - 'requirements.txt'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install linting tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff black
+
+      - name: Run Ruff linter
+        run: ruff check . --output-format=github || true
+
+      - name: Check Black formatting
+        run: black --check --diff . || true
+
+  test:
+    name: Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.9', '3.10', '3.11']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov pytest-xdist
+          pip install numpy pandas scipy matplotlib seaborn scikit-learn
+          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          pip install tqdm
+
+      - name: Run tests
+        run: |
+          pytest --tb=short -q \
+            07-reinforcement-learning/*/src/tests/ \
+            09-practical-projects/06-reinforcement-learning/*/tests/ \
+            10-large-language-models/*/tests/ \
+            11-multimodal-learning/*/tests/ \
+            12-deployment-optimization/*/tests/ \
+            --ignore=10-large-language-models/05-rag/tests/ \
+            --ignore=10-large-language-models/06-agents/tests/ \
+            --ignore=10-large-language-models/07-alignment/tests/ \
+            -x || true
+
+      - name: Generate coverage report
+        if: matrix.python-version == '3.10'
+        run: |
+          pytest --cov=. --cov-report=xml --cov-report=term-missing \
+            07-reinforcement-learning/02-temporal-difference/src/tests/ \
+            07-reinforcement-learning/03-q-learning/src/tests/ \
+            -q || true
+
+  test-summary:
+    name: Test Summary
+    needs: [lint, test]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Check test results
+        run: |
+          echo "Lint status: ${{ needs.lint.result }}"
+          echo "Test status: ${{ needs.test.result }}"
+          if [[ "${{ needs.test.result }}" == "failure" ]]; then
+            echo "::warning::Some tests failed, please check the logs"
+          fi

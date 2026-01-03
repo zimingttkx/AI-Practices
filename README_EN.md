@@ -29,7 +29,7 @@
 
 <div align="center">
 
-| 📚 **219+ Notebooks** | 🧩 **9 Core Modules** | 📝 **480+ Python Files** | 💻 **173k+ LOC** | 🏆 **2 Kaggle Golds** |
+| 📚 **250+ Notebooks** | 🧩 **12 Core Modules** | 📝 **600+ Python Files** | 💻 **200k+ LOC** | 🏆 **2 Kaggle Golds** |
 |:---------------------:|:---------------------:|:------------------------:|:----------------:|:---------------------:|
 | Reproducible Experiments | Systematic Learning Path | Production-Ready Code | Deep Coverage | Competition Verified |
 
@@ -66,9 +66,12 @@
 | II | **04-Sequence Models** | RNN/LSTM, Attention, Transformer | 40+ |
 | III | **05-Advanced Topics** | Distributed Training, Model Compression, Deployment | 30+ |
 | III | **06-Generative Models** | VAE, GAN, Diffusion Models | 35+ |
-| III | **07-Reinforcement Learning** | DQN, PPO, SAC, Actor-Critic | 542+ |
-| IV | **09-Practical Projects** | Kaggle Competitions, Game AI, Stock Trading | 566+ |
+| III | **07-Reinforcement Learning** | DQN, PPO, SAC, Actor-Critic | 80+ |
+| IV | **09-Practical Projects** | Kaggle Competitions, Game AI, Stock Trading | 100+ |
 | - | **08-Theory Notes** | Activation Functions, Loss Functions, Architecture Guide | 16+ |
+| V | **10-Large Language Models** | Transformer, GPT/LLaMA, LoRA, RAG, Agents | 60+ |
+| V | **11-Multimodal Learning** | CLIP, Stable Diffusion, Whisper, TTS | 47+ |
+| V | **12-Deployment Optimization** | Quantization, TensorRT, FastAPI, MLOps | 50+ |
 
 <details>
 <summary><b>📂 Expand Full Directory Structure</b></summary>
@@ -91,19 +94,42 @@ AI-Practices/
 │   ├── 03-custom-models-training/  # Custom Layers and Training Loops
 │   └── 04-data-loading-preprocessing/
 │
-├── 07-reinforcement-learning/      # Reinforcement Learning (542+ files)
+├── 07-reinforcement-learning/      # Reinforcement Learning
 │   ├── 01-mdp-basics/              # Markov Decision Process
-│   ├── 02-q-learning/              # Value Iteration, Policy Iteration
-│   ├── 03-deep-q-learning/         # DQN, Double DQN
-│   └── 04-policy-gradient/         # REINFORCE, PPO, A3C
+│   ├── 02-temporal-difference/     # TD Learning
+│   ├── 03-q-learning/              # Q-Learning
+│   ├── 04-deep-q-learning/         # DQN, Double DQN
+│   ├── 05-policy-gradient/         # REINFORCE, PPO
+│   ├── 06-actor-critic/            # A2C, A3C
+│   └── 07-advanced-algorithms/     # SAC, TD3
 │
-└── 09-practical-projects/          # Practical Projects (566+ files)
-    ├── 01-ml-basics/               # Titanic, Otto
-    ├── 02-computer-vision/         # MNIST CNN
-    ├── 03-nlp/                     # Sentiment Analysis, NER
-    ├── 04-time-series/             # Temperature Prediction
-    ├── 05-kaggle-competitions/     # Gold Medal Solutions
-    └── 06-reinforcement-learning/  # Game AI, Stock Trading
+├── 09-practical-projects/          # Practical Projects
+│   ├── 01-ml-basics/               # Titanic, Otto
+│   ├── 02-computer-vision/         # MNIST CNN
+│   ├── 03-nlp/                     # Sentiment Analysis, NER
+│   ├── 04-time-series/             # Temperature Prediction
+│   ├── 05-kaggle-competitions/     # Gold Medal Solutions
+│   └── 06-reinforcement-learning/  # Game AI, Stock Trading
+│
+├── 10-large-language-models/       # Large Language Models
+│   ├── 01-llm-fundamentals/        # Transformer Architecture
+│   ├── 02-pretrained-models/       # GPT, LLaMA Implementation
+│   ├── 03-fine-tuning/             # LoRA, QLoRA Fine-tuning
+│   ├── 04-prompt-engineering/      # Prompt Engineering
+│   ├── 05-rag/                     # Retrieval Augmented Generation
+│   ├── 06-agents/                  # Agent Systems
+│   └── 07-alignment/               # RLHF, DPO Alignment
+│
+├── 11-multimodal-learning/         # Multimodal Learning
+│   ├── 01-vision-language/         # CLIP, BLIP, LLaVA
+│   ├── 02-image-generation/        # VAE, Diffusion, ControlNet
+│   └── 03-audio-models/            # Whisper, TTS
+│
+└── 12-deployment-optimization/     # Deployment Optimization
+    ├── 01-model-optimization/      # Quantization, Pruning, Distillation
+    ├── 02-inference-engines/       # TensorRT, vLLM
+    ├── 03-serving-systems/         # FastAPI, gRPC
+    └── 04-mlops/                   # Experiment Tracking, Monitoring
 ```
 
 </details>
@@ -181,6 +207,35 @@ $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)
 **Bellman Optimality Equation**:
 
 $$Q^*(s, a) = \mathbb{E}\left[r + \gamma \max_{a'} Q^*(s', a') \mid s, a\right]$$
+
+### Large Language Models
+
+| Domain | Techniques | Applications |
+|:-------|:-----------|:-------------|
+| **Architecture** | Transformer, GPT, LLaMA | Text Generation, Dialogue |
+| **Efficient Fine-tuning** | LoRA, QLoRA, Adapter | Low-resource Tuning |
+| **Prompt Engineering** | Few-shot, CoT, ReAct | Task Guidance |
+| **Retrieval Augmented** | RAG, Vector Databases | Knowledge QA |
+| **Agent Systems** | Tool Calling, Memory | Autonomous Tasks |
+| **Alignment** | RLHF, DPO | Safety Alignment |
+
+### Multimodal Learning
+
+| Domain | Models | Applications |
+|:-------|:-------|:-------------|
+| **Vision-Language** | CLIP, BLIP, LLaVA | Image-Text Understanding, VQA |
+| **Image Generation** | VAE, Diffusion, ControlNet | Text-to-Image, Image Editing |
+| **Speech Recognition** | Whisper | Multilingual ASR |
+| **Speech Synthesis** | Tacotron, HiFi-GAN | Text-to-Speech |
+
+### Deployment Optimization
+
+| Domain | Techniques | Description |
+|:-------|:-----------|:------------|
+| **Model Optimization** | Quantization, Pruning, Distillation | Model Compression |
+| **Inference Engines** | TensorRT, vLLM, Triton | High-performance Inference |
+| **Serving Systems** | FastAPI, gRPC | API Services |
+| **MLOps** | Experiment Tracking, Model Registry, Monitoring | Production Operations |
 
 ---
 

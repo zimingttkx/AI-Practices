@@ -1,0 +1,77 @@
+# AI-Practices Docker Compose Configuration
+# Usage:
+#   docker-compose up dev        - Development environment
+#   docker-compose up jupyter    - Jupyter Lab server
+#   docker-compose up test       - Run tests
+#   docker-compose build         - Build all images
+
+version: '3.8'
+
+services:
+  # Development environment with all tools
+  dev:
+    build:
+      context: .
+      target: development
+    container_name: ai-practices-dev
+    volumes:
+      - .:/app
+      - pip-cache:/root/.cache/pip
+    working_dir: /app
+    stdin_open: true
+    tty: true
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONDONTWRITEBYTECODE=1
+      - PYTHONUNBUFFERED=1
+
+  # Jupyter Lab server
+  jupyter:
+    build:
+      context: .
+      target: jupyter
+    container_name: ai-practices-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/app
+      - jupyter-data:/root/.jupyter
+    working_dir: /app
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - PYTHONPATH=/app
+
+  # Test runner
+  test:
+    build:
+      context: .
+      target: test
+    container_name: ai-practices-test
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - PYTHONPATH=/app
+      - PYTEST_ADDOPTS=-v --tb=short
+
+  # Production-like environment
+  prod:
+    build:
+      context: .
+      target: production
+    container_name: ai-practices-prod
+    volumes:
+      - ./data:/app/data:ro
+    working_dir: /app
+    environment:
+      - PYTHONPATH=/app
+
+volumes:
+  pip-cache:
+    driver: local
+  jupyter-data:
+    driver: local
+
+networks:
+  default:
+    name: ai-practices-network

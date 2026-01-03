@@ -1,0 +1,208 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-practices"
+version = "1.0.0"
+description = "AI/ML learning practices covering foundations to LLMs"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [
+    {name = "zimingttkx"}
+]
+keywords = [
+    "machine-learning",
+    "deep-learning",
+    "artificial-intelligence",
+    "pytorch",
+    "tensorflow",
+    "llm",
+    "reinforcement-learning"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "scipy>=1.10.0",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    "scikit-learn>=1.3.0",
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "tqdm>=4.65.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-xdist>=3.3.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.4.0",
+]
+llm = [
+    "transformers>=4.30.0",
+    "peft>=0.5.0",
+    "accelerate>=0.21.0",
+    "langchain>=0.1.0",
+    "chromadb>=0.4.0",
+    "faiss-cpu>=1.7.0",
+    "sentence-transformers>=2.2.0",
+]
+full = [
+    "tensorflow>=2.13.0",
+    "keras>=2.13.0",
+    "xgboost>=1.7.0",
+    "lightgbm>=4.0.0",
+    "opencv-python>=4.8.0",
+    "pillow>=10.0.0",
+    "nltk>=3.8.0",
+    "jupyter>=1.0.0",
+    "notebook>=7.0.0",
+    "plotly>=5.14.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/dingziming/AI-Practices"
+Repository = "https://github.com/dingziming/AI-Practices"
+Documentation = "https://github.com/dingziming/AI-Practices#readme"
+
+# ============== pytest ==============
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = [
+    "07-reinforcement-learning",
+    "09-practical-projects",
+    "10-large-language-models",
+    "11-multimodal-learning",
+    "12-deployment-optimization",
+]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "-ra",
+    "--strict-markers",
+    "--import-mode=importlib",
+    "--ignore=07-reinforcement-learning/03-q-learning/src/tests",
+    "--ignore=07-reinforcement-learning/04-deep-q-learning/src/tests",
+    "--ignore=07-reinforcement-learning/05-policy-gradient/src/tests",
+    "--ignore=07-reinforcement-learning/06-actor-critic/src/tests",
+    "--ignore=07-reinforcement-learning/07-advanced-algorithms/src/tests",
+    "--ignore=09-practical-projects/04-time-series/02-stock-prediction-lstm/test_all.py",
+    "--ignore=09-practical-projects/05-kaggle-competitions/02-Feedback-ELL-1st-Place",
+    "--ignore=09-practical-projects/06-reinforcement-learning",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "gpu: marks tests that require GPU",
+    "integration: marks integration tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+# ============== coverage ==============
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/node_modules/*",
+    "*.ipynb",
+]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+show_missing = true
+skip_covered = true
+
+# ============== black ==============
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | node_modules
+    | __pycache__
+)/
+'''
+
+# ============== ruff ==============
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # Pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "UP",     # pyupgrade
+    "SIM",    # flake8-simplify
+]
+ignore = [
+    "E501",   # line too long (handled by black)
+    "B008",   # do not perform function calls in argument defaults
+    "C901",   # too complex
+    "E731",   # do not assign a lambda expression
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"**/tests/**" = ["B011", "S101"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ai_practices"]
+
+# ============== mypy ==============
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+exclude = [
+    "node_modules",
+    "build",
+    "dist",
+    "__pycache__",
+]
