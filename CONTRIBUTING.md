@@ -94,17 +94,20 @@ docs(readme): update installation instructions
 
 ```
 AI-Practices/
-├── 01-foundations/          # ML basics
-├── 02-neural-networks/      # Deep learning fundamentals
-├── 03-computer-vision/      # CNN and image processing
-├── 04-sequence-models/      # RNN, LSTM, Transformers
-├── 05-advanced-topics/      # Specialized topics
-├── 06-generative-models/    # GANs, VAE, Diffusion
-├── 07-reinforcement-learning/
-├── 08-theory-notes/         # Mathematical foundations
-├── 09-practical-projects/   # End-to-end projects
-├── utils/                   # Shared utilities
-└── docs/                    # Documentation
+├── 01-foundations/              # ML basics
+├── 02-neural-networks/          # Deep learning fundamentals
+├── 03-computer-vision/          # CNN and image processing
+├── 04-sequence-models/          # RNN, LSTM, Transformers
+├── 05-advanced-topics/          # Specialized topics
+├── 06-generative-models/        # GANs, VAE, Diffusion
+├── 07-reinforcement-learning/   # RL algorithms
+├── 08-theory-notes/             # Mathematical foundations
+├── 09-practical-projects/       # End-to-end projects
+├── 10-large-language-models/    # LLM, RAG, Agents
+├── 11-multimodal-learning/      # CLIP, Diffusion, Audio
+├── 12-deployment-optimization/  # Quantization, Serving, MLOps
+├── utils/                       # Shared utilities
+└── docs/                        # Documentation
 ```
 
 ### Questions?
