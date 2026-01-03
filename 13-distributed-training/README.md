@@ -61,6 +61,10 @@ Distributed Training
 │   │   ├── ddp.py           # PyTorch DDP wrapper
 │   │   ├── fsdp.py          # FSDP trainer
 │   │   └── zero.py          # ZeRO optimizer implementation
+│   ├── notebooks/           # Interactive tutorials
+│   │   ├── 01_ddp_tutorial.ipynb
+│   │   ├── 02_fsdp_tutorial.ipynb
+│   │   └── 03_zero_tutorial.ipynb
 │   └── tests/               # 28 test cases
 │
 ├── 02-model-parallel/       # Model Parallelism: Tensor/Pipeline/Sequence
@@ -68,6 +72,10 @@ Distributed Training
 │   │   ├── tensor_parallel.py    # Column/Row/Vocab parallel
 │   │   ├── pipeline_parallel.py  # GPipe/PipeDream schedulers
 │   │   └── sequence_parallel.py  # Sequence dimension sharding
+│   ├── notebooks/
+│   │   ├── 01_tensor_parallel_tutorial.ipynb
+│   │   ├── 02_pipeline_parallel_tutorial.ipynb
+│   │   └── 03_sequence_parallel_tutorial.ipynb
 │   └── tests/               # 26 test cases
 │
 ├── 03-mixed-precision/      # Mixed Precision: AMP, BF16, Gradient Scaling
@@ -75,6 +83,9 @@ Distributed Training
 │   │   ├── amp.py           # Automatic mixed precision trainer
 │   │   ├── bf16_training.py # BF16 training support
 │   │   └── gradient_scaling.py  # Dynamic gradient scaling
+│   ├── notebooks/
+│   │   ├── 01_amp_tutorial.ipynb
+│   │   └── 02_bf16_training_tutorial.ipynb
 │   └── tests/               # 31 test cases
 │
 └── 04-large-scale-training/ # Large-Scale Training Tools
@@ -82,6 +93,10 @@ Distributed Training
     │   ├── deepspeed_config.py  # DeepSpeed config generator
     │   ├── megatron_core.py     # Megatron parallel state management
     │   └── checkpoint_utils.py  # Distributed checkpointing
+    ├── notebooks/
+    │   ├── 01_deepspeed_tutorial.ipynb
+    │   ├── 02_megatron_tutorial.ipynb
+    │   └── 03_checkpoint_tutorial.ipynb
     └── tests/               # 20 test cases
 ```
 
