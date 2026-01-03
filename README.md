@@ -29,7 +29,7 @@
 
 <div align="center">
 
-| **300+ Notebooks** | **12大核心模块** | **1000+ 单元测试** | **生产级代码** | **2枚Kaggle金牌** |
+| **350+ Notebooks** | **13大核心模块** | **1100+ 单元测试** | **生产级代码** | **2枚Kaggle金牌** |
 |:------------------:|:----------------:|:-----------------:|:-------------:|:----------------:|
 | 可复现实验 | 系统化学习路径 | 质量保证 | 工程实践 | 竞赛验证 |
 
@@ -72,6 +72,7 @@
 | V | **10-大语言模型** | Transformer、GPT/LLaMA、LoRA微调、RAG、Agent | 60+ |
 | V | **11-多模态学习** | CLIP、Stable Diffusion、Whisper、TTS | 47+ |
 | V | **12-部署优化** | 量化剪枝、TensorRT、FastAPI、MLOps | 50+ |
+| VI | **13-分布式训练** | DDP、FSDP、ZeRO、张量/流水线并行、混合精度 | 42+ |
 
 <details>
 <summary><b>📂 展开完整目录结构</b></summary>
@@ -125,11 +126,17 @@ AI-Practices/
 │   ├── 02-image-generation/        # VAE、Diffusion、ControlNet
 │   └── 03-audio-models/            # Whisper、TTS
 │
-└── 12-deployment-optimization/     # 部署优化
-    ├── 01-model-optimization/      # 量化、剪枝、蒸馏
-    ├── 02-inference-engines/       # TensorRT、vLLM
-    ├── 03-serving-systems/         # FastAPI、gRPC
-    └── 04-mlops/                   # 实验追踪、监控
+├── 12-deployment-optimization/     # 部署优化
+│   ├── 01-model-optimization/      # 量化、剪枝、蒸馏
+│   ├── 02-inference-engines/       # TensorRT、vLLM
+│   ├── 03-serving-systems/         # FastAPI、gRPC
+│   └── 04-mlops/                   # 实验追踪、监控
+│
+└── 13-distributed-training/        # 分布式训练
+    ├── 01-data-parallel/           # DDP、FSDP、ZeRO
+    ├── 02-model-parallel/          # 张量并行、流水线并行
+    ├── 03-mixed-precision/         # AMP、BF16、梯度缩放
+    └── 04-large-scale-training/    # DeepSpeed、Megatron
 ```
 
 </details>
@@ -236,6 +243,15 @@ $$Q^*(s, a) = \mathbb{E}\left[r + \gamma \max_{a'} Q^*(s', a') \mid s, a\right]$
 | **推理引擎** | TensorRT、vLLM、Triton | 高性能推理 |
 | **服务系统** | FastAPI、gRPC | API服务 |
 | **MLOps** | 实验追踪、模型注册、监控 | 生产运维 |
+
+### 分布式训练
+
+| 领域 | 技术 | 说明 |
+|:-----|:-----|:-----|
+| **数据并行** | DDP、FSDP、ZeRO | 梯度同步、内存优化 |
+| **模型并行** | 张量并行、流水线并行、序列并行 | 大模型切分 |
+| **混合精度** | AMP、BF16、梯度缩放 | 加速训练、节省显存 |
+| **大规模训练** | DeepSpeed、Megatron-LM | 百亿参数训练 |
 
 ---
 

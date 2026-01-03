@@ -79,6 +79,7 @@ jobs:
             10-large-language-models/*/tests/ \
             11-multimodal-learning/*/tests/ \
             12-deployment-optimization/*/tests/ \
+            13-distributed-training/*/tests/ \
             --ignore=10-large-language-models/05-rag/tests/ \
             --ignore=10-large-language-models/06-agents/tests/ \
             --ignore=10-large-language-models/07-alignment/tests/ \

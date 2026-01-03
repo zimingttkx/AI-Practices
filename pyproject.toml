@@ -91,6 +91,7 @@ testpaths = [
     "10-large-language-models",
     "11-multimodal-learning",
     "12-deployment-optimization",
+    "13-distributed-training",
 ]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]

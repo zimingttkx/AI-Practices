@@ -29,7 +29,7 @@
 
 <div align="center">
 
-| **300+ Notebooks** | **12 Core Modules** | **1000+ Unit Tests** | **Production-Ready** | **2 Kaggle Golds** |
+| **350+ Notebooks** | **13 Core Modules** | **1100+ Unit Tests** | **Production-Ready** | **2 Kaggle Golds** |
 |:------------------:|:-------------------:|:--------------------:|:--------------------:|:------------------:|
 | Reproducible Experiments | Systematic Learning Path | Quality Assurance | Engineering Practice | Competition Verified |
 
@@ -72,6 +72,7 @@
 | V | **10-Large Language Models** | Transformer, GPT/LLaMA, LoRA, RAG, Agents | 60+ |
 | V | **11-Multimodal Learning** | CLIP, Stable Diffusion, Whisper, TTS | 47+ |
 | V | **12-Deployment Optimization** | Quantization, TensorRT, FastAPI, MLOps | 50+ |
+| VI | **13-Distributed Training** | DDP, FSDP, ZeRO, Tensor/Pipeline Parallel, Mixed Precision | 42+ |
 
 <details>
 <summary><b>📂 Expand Full Directory Structure</b></summary>
@@ -125,11 +126,17 @@ AI-Practices/
 │   ├── 02-image-generation/        # VAE, Diffusion, ControlNet
 │   └── 03-audio-models/            # Whisper, TTS
 │
-└── 12-deployment-optimization/     # Deployment Optimization
-    ├── 01-model-optimization/      # Quantization, Pruning, Distillation
-    ├── 02-inference-engines/       # TensorRT, vLLM
-    ├── 03-serving-systems/         # FastAPI, gRPC
-    └── 04-mlops/                   # Experiment Tracking, Monitoring
+├── 12-deployment-optimization/     # Deployment Optimization
+│   ├── 01-model-optimization/      # Quantization, Pruning, Distillation
+│   ├── 02-inference-engines/       # TensorRT, vLLM
+│   ├── 03-serving-systems/         # FastAPI, gRPC
+│   └── 04-mlops/                   # Experiment Tracking, Monitoring
+│
+└── 13-distributed-training/        # Distributed Training
+    ├── 01-data-parallel/           # DDP, FSDP, ZeRO
+    ├── 02-model-parallel/          # Tensor Parallel, Pipeline Parallel
+    ├── 03-mixed-precision/         # AMP, BF16, Gradient Scaling
+    └── 04-large-scale-training/    # DeepSpeed, Megatron
 ```
 
 </details>
@@ -236,6 +243,15 @@ $$Q^*(s, a) = \mathbb{E}\left[r + \gamma \max_{a'} Q^*(s', a') \mid s, a\right]$
 | **Inference Engines** | TensorRT, vLLM, Triton | High-performance Inference |
 | **Serving Systems** | FastAPI, gRPC | API Services |
 | **MLOps** | Experiment Tracking, Model Registry, Monitoring | Production Operations |
+
+### Distributed Training
+
+| Domain | Techniques | Description |
+|:-------|:-----------|:------------|
+| **Data Parallel** | DDP, FSDP, ZeRO | Gradient Sync, Memory Optimization |
+| **Model Parallel** | Tensor Parallel, Pipeline Parallel, Sequence Parallel | Large Model Partitioning |
+| **Mixed Precision** | AMP, BF16, Gradient Scaling | Faster Training, Memory Saving |
+| **Large-Scale Training** | DeepSpeed, Megatron-LM | Billion-Parameter Training |
 
 ---
 

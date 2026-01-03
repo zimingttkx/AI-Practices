@@ -2,6 +2,10 @@
 
 本文档定义了 AI-Practices 项目的代码风格、文件命名和目录结构规范。
 
+> **最后更新**: 2026-01-03
+
+---
+
 ## 目录结构
 
 ### 模块命名
@@ -33,6 +37,8 @@ XX-module-name/
 | 类名 | `PascalCase` | `TransformerEncoder`, `CLIPModel` |
 | 函数名 | `snake_case` | `compute_loss`, `forward_pass` |
 | 常量 | `UPPER_SNAKE_CASE` | `MAX_LENGTH`, `DEFAULT_LR` |
+
+---
 
 ## 代码风格
 
@@ -312,3 +318,94 @@ full = ["tensorflow", "keras", "xgboost"]
 - [ ] 无硬编码的敏感信息
 - [ ] 无冗余的调试代码
 - [ ] 提交信息格式正确
+
+---
+
+## 环境配置
+
+### 本地开发
+
+```bash
+# 克隆仓库
+git clone https://github.com/zimingttkx/AI-Practices.git
+cd AI-Practices
+
+# 创建虚拟环境
+conda create -n ai-practices python=3.10 -y
+conda activate ai-practices
+
+# 安装依赖
+pip install -r requirements.txt
+pip install -e ".[dev]"
+
+# 运行测试
+pytest -v
+```
+
+### Docker 开发
+
+```bash
+# 构建镜像
+docker-compose build
+
+# 启动开发环境
+docker-compose up dev
+
+# 启动 Jupyter Lab
+docker-compose up jupyter
+```
+
+---
+
+## 质量保证
+
+### 代码检查
+
+```bash
+# 格式化代码
+black .
+
+# 代码检查
+ruff check .
+
+# 类型检查
+mypy .
+```
+
+### 测试覆盖
+
+```bash
+# 运行所有测试
+pytest
+
+# 带覆盖率报告
+pytest --cov=. --cov-report=html
+
+# 运行特定模块测试
+pytest 13-distributed-training/
+```
+
+---
+
+## 常见问题
+
+### Q: 如何添加新模块？
+
+1. 创建目录结构 `XX-module-name/YY-submodule/`
+2. 添加 `src/`、`tests/`、`notebooks/` 目录
+3. 更新 `pyproject.toml` 的 `testpaths`
+4. 更新 `.github/CODEOWNERS`
+5. 更新 README.md 模块列表
+
+### Q: 如何运行特定测试？
+
+```bash
+# 运行单个测试文件
+pytest path/to/test_file.py
+
+# 运行特定测试函数
+pytest path/to/test_file.py::test_function_name
+
+# 运行特定测试类
+pytest path/to/test_file.py::TestClassName
+```

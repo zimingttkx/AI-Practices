@@ -26,6 +26,7 @@
 /10-large-language-models/  @zimingttkx
 /11-multimodal-learning/    @zimingttkx
 /12-deployment-optimization/ @zimingttkx
+/13-distributed-training/   @zimingttkx
 
 # Utilities
 /utils/                     @zimingttkx

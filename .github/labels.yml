@@ -145,6 +145,10 @@
   color: "c5def5"
   description: "Deployment Optimization module"
 
+- name: "module: distributed-training"
+  color: "c5def5"
+  description: "Distributed Training module"
+
 # Other
 - name: "question"
   color: "d876e3"
