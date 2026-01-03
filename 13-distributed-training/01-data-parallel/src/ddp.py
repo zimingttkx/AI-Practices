@@ -1,19 +1,42 @@
 """
-PyTorch Distributed Data Parallel (DDP) 实现
+Distributed Data Parallel (DDP) Implementation
 
-DDP 是 PyTorch 中最常用的数据并行方式，通过在多个 GPU 上复制模型，
-每个 GPU 处理不同的数据批次，然后同步梯度来实现并行训练。
+Core Idea:
+    DDP replicates the model on each GPU and synchronizes gradients via AllReduce
+    after backward pass, enabling data-parallel training across multiple devices.
 
-核心概念:
-    - 每个进程持有完整的模型副本
-    - 数据在进程间分片
-    - 梯度通过 AllReduce 同步
-    - 支持单机多卡和多机多卡
+Mathematical Theory:
+    Given N workers, each processes a mini-batch B_i. The gradient update is:
+    
+    .. math::
+        g = \\frac{1}{N} \\sum_{i=1}^{N} \\nabla L(B_i, \\theta)
+    
+    where L is the loss function and theta represents model parameters.
+    AllReduce computes this average efficiently using ring-based communication.
+
+Problem Statement:
+    Single-GPU training is limited by memory and compute. DDP addresses this by
+    distributing data across GPUs while maintaining synchronous gradient updates,
+    achieving near-linear scaling with minimal communication overhead.
+
+Comparison:
+    - vs DataParallel: DDP uses multi-process (no GIL), DP uses multi-thread
+    - vs FSDP: DDP replicates full model, FSDP shards parameters
+    - vs Pipeline: DDP splits data, Pipeline splits model layers
+
+Complexity:
+    - Communication: O(P) per AllReduce, where P is parameter count
+    - Memory: O(P) per GPU (full model replica)
+    - Computation: O(B/N) per GPU, where B is total batch size
+
+References:
+    - Li et al., "PyTorch Distributed: Experiences on Accelerating Data Parallel
+      Training", VLDB 2020
 """
 
 import os
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Union
 
 import torch
 import torch.nn as nn
@@ -24,18 +47,19 @@ from torch.utils.data import DataLoader, Dataset, DistributedSampler
 
 @dataclass
 class DDPConfig:
-    """DDP 配置类
+    """Configuration for Distributed Data Parallel training.
     
     Attributes:
-        backend: 通信后端 ("nccl", "gloo", "mpi")
-        init_method: 初始化方法 ("env://", "tcp://", "file://")
-        world_size: 总进程数
-        rank: 当前进程排名
-        local_rank: 本地 GPU 排名
-        find_unused_parameters: 是否查找未使用的参数
-        broadcast_buffers: 是否广播缓冲区
-        gradient_as_bucket_view: 梯度作为桶视图
-        static_graph: 是否使用静态图优化
+        backend: Communication backend. "nccl" for GPU, "gloo" for CPU.
+        init_method: Process group initialization method.
+        world_size: Total number of processes (-1 for auto-detection).
+        rank: Global rank of current process (-1 for auto-detection).
+        local_rank: Local GPU index on current node.
+        find_unused_parameters: Enable gradient computation for unused params.
+        broadcast_buffers: Synchronize module buffers across replicas.
+        gradient_as_bucket_view: Memory optimization for gradient storage.
+        static_graph: Enable static graph optimization for fixed architectures.
+        bucket_cap_mb: Maximum bucket size for gradient bucketing (MB).
     """
     backend: str = "nccl"
     init_method: str = "env://"
@@ -57,15 +81,21 @@ def setup_ddp(
     master_addr: str = "localhost",
     master_port: str = "12355",
 ) -> None:
-    """初始化 DDP 环境
+    """Initialize the distributed process group for DDP training.
+    
+    This function sets up the communication infrastructure required for
+    gradient synchronization across multiple processes/GPUs.
     
     Args:
-        rank: 当前进程排名
-        world_size: 总进程数
-        backend: 通信后端
-        init_method: 初始化方法
-        master_addr: 主节点地址
-        master_port: 主节点端口
+        rank: Unique identifier for this process (0 to world_size-1).
+        world_size: Total number of processes participating in training.
+        backend: Communication backend ("nccl" for GPU, "gloo" for CPU).
+        init_method: URL specifying how to initialize the process group.
+        master_addr: IP address of the rank-0 process.
+        master_port: Port number for inter-process communication.
+    
+    Raises:
+        RuntimeError: If process group initialization fails.
     """
     os.environ["MASTER_ADDR"] = master_addr
     os.environ["MASTER_PORT"] = master_port
@@ -82,37 +112,37 @@ def setup_ddp(
 
 
 def cleanup_ddp() -> None:
-    """清理 DDP 环境"""
+    """Destroy the distributed process group and release resources."""
     if dist.is_initialized():
         dist.destroy_process_group()
 
 
 def get_rank() -> int:
-    """获取当前进程排名"""
+    """Return the global rank of the current process (0 if not distributed)."""
     if not dist.is_initialized():
         return 0
     return dist.get_rank()
 
 
 def get_world_size() -> int:
-    """获取总进程数"""
+    """Return the total number of processes (1 if not distributed)."""
     if not dist.is_initialized():
         return 1
     return dist.get_world_size()
 
 
 def is_main_process() -> bool:
-    """判断是否为主进程"""
+    """Check if current process is the main process (rank 0)."""
     return get_rank() == 0
 
 
 def get_local_rank() -> int:
-    """获取本地 GPU 排名"""
+    """Return the local GPU index on the current node."""
     return int(os.environ.get("LOCAL_RANK", 0))
 
 
 def synchronize() -> None:
-    """同步所有进程"""
+    """Block until all processes reach this barrier."""
     if dist.is_initialized():
         dist.barrier()
 
@@ -121,16 +151,20 @@ def all_reduce_tensor(
     tensor: torch.Tensor,
     op: dist.ReduceOp = dist.ReduceOp.SUM,
     async_op: bool = False,
-) -> torch.Tensor:
-    """对张量执行 AllReduce 操作
+) -> Union[torch.Tensor, tuple]:
+    """Perform AllReduce operation on a tensor across all processes.
+    
+    AllReduce aggregates tensors from all processes using the specified
+    reduction operation (SUM, AVG, MAX, MIN) and distributes the result
+    back to all processes.
     
     Args:
-        tensor: 输入张量
-        op: 归约操作类型
-        async_op: 是否异步执行
+        tensor: Input tensor to reduce.
+        op: Reduction operation (SUM, AVG, MAX, MIN, PRODUCT).
+        async_op: If True, return immediately with a handle for later wait.
         
     Returns:
-        归约后的张量
+        Reduced tensor, or tuple of (tensor, handle) if async_op=True.
     """
     if not dist.is_initialized():
         return tensor
@@ -145,14 +179,14 @@ def all_gather_tensor(
     tensor: torch.Tensor,
     world_size: Optional[int] = None,
 ) -> List[torch.Tensor]:
-    """收集所有进程的张量
+    """Gather tensors from all processes into a list.
     
     Args:
-        tensor: 输入张量
-        world_size: 总进程数
+        tensor: Local tensor to gather.
+        world_size: Total number of processes (auto-detected if None).
         
     Returns:
-        所有进程张量的列表
+        List of tensors from all processes, ordered by rank.
     """
     if not dist.is_initialized():
         return [tensor]
@@ -169,14 +203,14 @@ def broadcast_tensor(
     tensor: torch.Tensor,
     src: int = 0,
 ) -> torch.Tensor:
-    """从源进程广播张量
+    """Broadcast tensor from source process to all other processes.
     
     Args:
-        tensor: 输入张量
-        src: 源进程排名
+        tensor: Tensor to broadcast (only src process value is used).
+        src: Source process rank.
         
     Returns:
-        广播后的张量
+        Broadcasted tensor (same value on all processes).
     """
     if not dist.is_initialized():
         return tensor
@@ -189,14 +223,14 @@ def reduce_dict(
     input_dict: Dict[str, torch.Tensor],
     average: bool = True,
 ) -> Dict[str, torch.Tensor]:
-    """归约字典中的所有张量
+    """Reduce all tensors in a dictionary across processes.
     
     Args:
-        input_dict: 输入字典
-        average: 是否取平均
+        input_dict: Dictionary mapping names to tensors.
+        average: If True, compute mean; otherwise compute sum.
         
     Returns:
-        归约后的字典
+        Dictionary with reduced tensors.
     """
     if not dist.is_initialized():
         return input_dict
@@ -219,14 +253,29 @@ def reduce_dict(
 
 
 class DDPTrainer:
-    """DDP 训练器
+    """High-level trainer for Distributed Data Parallel training.
     
-    封装了 DDP 训练的常用操作，包括模型包装、数据加载、训练循环等。
+    This class encapsulates common DDP operations including model wrapping,
+    distributed data loading, checkpointing, and logging.
+    
+    Mathematical Background:
+        DDP achieves data parallelism by partitioning the global batch B into
+        N local batches, where each GPU processes B/N samples. Gradients are
+        synchronized via ring-AllReduce with O(2P(N-1)/N) communication cost,
+        where P is the parameter count.
     
     Args:
-        model: PyTorch 模型
-        config: DDP 配置
-        device: 训练设备
+        model: PyTorch model to be distributed.
+        config: DDP configuration options.
+        device: Target device (auto-detected if None).
+    
+    Example:
+        >>> trainer = DDPTrainer(model, DDPConfig())
+        >>> trainer.wrap_model()
+        >>> dataloader = trainer.create_dataloader(dataset, batch_size=32)
+        >>> for batch in dataloader:
+        ...     loss = trainer.get_model()(batch)
+        ...     loss.backward()
     """
     
     def __init__(
@@ -252,7 +301,11 @@ class DDPTrainer:
         self._is_wrapped = False
     
     def wrap_model(self) -> DDP:
-        """将模型包装为 DDP 模型"""
+        """Wrap the model with DistributedDataParallel.
+        
+        Returns:
+            DDP-wrapped model ready for distributed training.
+        """
         if self._is_wrapped:
             return self.ddp_model
         
@@ -270,13 +323,13 @@ class DDPTrainer:
         return self.ddp_model
     
     def get_model(self) -> nn.Module:
-        """获取模型（DDP 包装后或原始模型）"""
+        """Return the DDP-wrapped model if available, otherwise the raw model."""
         if self._is_wrapped:
             return self.ddp_model
         return self.model
     
     def get_raw_model(self) -> nn.Module:
-        """获取原始模型（去除 DDP 包装）"""
+        """Return the underlying model without DDP wrapper."""
         if self._is_wrapped:
             return self.ddp_model.module
         return self.model
@@ -291,18 +344,22 @@ class DDPTrainer:
         drop_last: bool = True,
         **kwargs,
     ) -> DataLoader:
-        """创建分布式数据加载器
+        """Create a distributed DataLoader with automatic data sharding.
+        
+        The DistributedSampler ensures each process receives a unique subset
+        of the data, enabling efficient parallel data loading.
         
         Args:
-            dataset: 数据集
-            batch_size: 每个 GPU 的批次大小
-            shuffle: 是否打乱数据
-            num_workers: 数据加载工作进程数
-            pin_memory: 是否固定内存
-            drop_last: 是否丢弃最后不完整的批次
+            dataset: Source dataset.
+            batch_size: Batch size per GPU (global batch = batch_size * world_size).
+            shuffle: Whether to shuffle data each epoch.
+            num_workers: Number of data loading worker processes.
+            pin_memory: Pin memory for faster GPU transfer.
+            drop_last: Drop incomplete final batch.
+            **kwargs: Additional DataLoader arguments.
             
         Returns:
-            分布式数据加载器
+            Configured DataLoader with distributed sampling.
         """
         sampler = DistributedSampler(
             dataset,
@@ -330,14 +387,14 @@ class DDPTrainer:
         epoch: int = 0,
         **kwargs,
     ) -> None:
-        """保存检查点（仅主进程）
+        """Save training checkpoint (main process only).
         
         Args:
-            path: 保存路径
-            optimizer: 优化器
-            scheduler: 学习率调度器
-            epoch: 当前轮次
-            **kwargs: 其他需要保存的内容
+            path: File path for checkpoint.
+            optimizer: Optimizer state to save.
+            scheduler: Learning rate scheduler state to save.
+            epoch: Current training epoch.
+            **kwargs: Additional state to include.
         """
         if not is_main_process():
             return
@@ -363,16 +420,16 @@ class DDPTrainer:
         scheduler: Optional[Any] = None,
         strict: bool = True,
     ) -> Dict[str, Any]:
-        """加载检查点
+        """Load training checkpoint with proper device mapping.
         
         Args:
-            path: 检查点路径
-            optimizer: 优化器
-            scheduler: 学习率调度器
-            strict: 是否严格匹配参数
+            path: Checkpoint file path.
+            optimizer: Optimizer to restore state.
+            scheduler: Scheduler to restore state.
+            strict: Require exact parameter match.
             
         Returns:
-            检查点内容
+            Loaded checkpoint dictionary.
         """
         map_location = {"cuda:0": f"cuda:{self.local_rank}"}
         checkpoint = torch.load(path, map_location=map_location)
@@ -391,6 +448,6 @@ class DDPTrainer:
         return checkpoint
     
     def log(self, message: str, *args, **kwargs) -> None:
-        """日志输出（仅主进程）"""
+        """Print message (main process only to avoid duplicate output)."""
         if is_main_process():
             print(message, *args, **kwargs)

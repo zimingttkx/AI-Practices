@@ -1,18 +1,46 @@
 """
-张量并行 (Tensor Parallelism) 实现
+Tensor Parallelism Implementation
 
-张量并行将单个层的参数分片到多个 GPU 上，每个 GPU 计算部分结果，
-然后通过通信操作合并。主要用于大型 Transformer 模型。
+Core Idea:
+    Tensor parallelism partitions individual layers across GPUs, with each GPU
+    computing a portion of the layer output. This enables training layers that
+    are too large for a single GPU's memory.
 
-核心概念:
-    - 列并行: 按列分割权重矩阵
-    - 行并行: 按行分割权重矩阵
-    - 词表并行: 分割嵌入层
+Mathematical Theory:
+    For a linear layer Y = XW + b, tensor parallelism splits W along columns or rows:
+    
+    Column Parallel (split output features):
+    .. math::
+        W = [W_1, W_2, ..., W_N], \\quad Y_i = XW_i
+    
+    Row Parallel (split input features):
+    .. math::
+        W = \\begin{bmatrix} W_1 \\\\ W_2 \\\\ ... \\\\ W_N \\end{bmatrix}, 
+        \\quad Y = \\sum_{i=1}^{N} X_i W_i
+
+Problem Statement:
+    Large transformer models have attention and MLP layers with billions of
+    parameters. Tensor parallelism distributes these layers across GPUs,
+    reducing per-GPU memory while maintaining model semantics.
+
+Comparison:
+    - vs Pipeline: Tensor splits layers, Pipeline splits model depth
+    - vs FSDP: Tensor keeps activations local, FSDP shards everything
+    - vs Sequence: Tensor splits features, Sequence splits sequence length
+
+Complexity:
+    - Column Parallel: AllGather in forward, ReduceScatter in backward
+    - Row Parallel: ReduceScatter in forward, AllGather in backward
+    - Communication: O(B * S * H / N) per layer, where H is hidden size
+
+References:
+    - Shoeybi et al., "Megatron-LM: Training Multi-Billion Parameter Language
+      Models Using Model Parallelism", arXiv 2019
 """
 
 import math
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional
 
 import torch
 import torch.nn as nn
@@ -22,14 +50,14 @@ import torch.distributed as dist
 
 @dataclass
 class TensorParallelConfig:
-    """张量并行配置
+    """Configuration for tensor parallelism.
     
     Attributes:
-        world_size: 张量并行大小
-        rank: 当前进程排名
-        process_group: 进程组
-        sequence_parallel: 是否启用序列并行
-        async_tensor_parallel: 是否异步通信
+        world_size: Number of GPUs for tensor parallelism.
+        rank: Current GPU rank in tensor parallel group.
+        process_group: Distributed process group.
+        sequence_parallel: Enable sequence parallelism integration.
+        async_tensor_parallel: Enable asynchronous communication.
     """
     world_size: int = 1
     rank: int = 0
@@ -39,7 +67,7 @@ class TensorParallelConfig:
 
 
 def _get_tensor_parallel_world_size(config: Optional[TensorParallelConfig] = None) -> int:
-    """获取张量并行世界大小"""
+    """Return tensor parallel world size."""
     if config is not None:
         return config.world_size
     if dist.is_initialized():
@@ -48,7 +76,7 @@ def _get_tensor_parallel_world_size(config: Optional[TensorParallelConfig] = Non
 
 
 def _get_tensor_parallel_rank(config: Optional[TensorParallelConfig] = None) -> int:
-    """获取张量并行排名"""
+    """Return tensor parallel rank."""
     if config is not None:
         return config.rank
     if dist.is_initialized():
@@ -61,15 +89,15 @@ def tensor_parallel_split(
     dim: int = -1,
     config: Optional[TensorParallelConfig] = None,
 ) -> torch.Tensor:
-    """将张量按指定维度分割
+    """Split tensor along specified dimension for tensor parallelism.
     
     Args:
-        tensor: 输入张量
-        dim: 分割维度
-        config: 张量并行配置
+        tensor: Input tensor to split.
+        dim: Dimension to split along.
+        config: Tensor parallel configuration.
         
     Returns:
-        分割后的本地张量
+        Local partition of the tensor.
     """
     world_size = _get_tensor_parallel_world_size(config)
     rank = _get_tensor_parallel_rank(config)
@@ -89,15 +117,15 @@ def tensor_parallel_gather(
     dim: int = -1,
     config: Optional[TensorParallelConfig] = None,
 ) -> torch.Tensor:
-    """收集所有分片并拼接
+    """Gather tensor partitions from all ranks.
     
     Args:
-        tensor: 本地张量
-        dim: 拼接维度
-        config: 张量并行配置
+        tensor: Local tensor partition.
+        dim: Dimension to concatenate along.
+        config: Tensor parallel configuration.
         
     Returns:
-        完整张量
+        Full tensor gathered from all ranks.
     """
     world_size = _get_tensor_parallel_world_size(config)
     
@@ -113,7 +141,7 @@ def tensor_parallel_gather(
 
 
 class _CopyToModelParallelRegion(torch.autograd.Function):
-    """复制到模型并行区域（前向无操作，反向 AllReduce）"""
+    """Copy input to model parallel region (identity forward, AllReduce backward)."""
     
     @staticmethod
     def forward(ctx, input_, process_group):
@@ -128,7 +156,7 @@ class _CopyToModelParallelRegion(torch.autograd.Function):
 
 
 class _ReduceFromModelParallelRegion(torch.autograd.Function):
-    """从模型并行区域归约（前向 AllReduce，反向无操作）"""
+    """Reduce from model parallel region (AllReduce forward, identity backward)."""
     
     @staticmethod
     def forward(ctx, input_, process_group):
@@ -142,7 +170,7 @@ class _ReduceFromModelParallelRegion(torch.autograd.Function):
 
 
 class _GatherFromModelParallelRegion(torch.autograd.Function):
-    """从模型并行区域收集（前向 AllGather，反向 Split）"""
+    """Gather from model parallel region (AllGather forward, split backward)."""
     
     @staticmethod
     def forward(ctx, input_, dim, process_group, world_size, rank):
@@ -169,17 +197,22 @@ class _GatherFromModelParallelRegion(torch.autograd.Function):
 
 
 class ColumnParallelLinear(nn.Module):
-    """列并行线性层
+    """Column-parallel linear layer.
     
-    将权重矩阵按列分割，每个 GPU 计算部分输出特征。
-    Y = XA，其中 A 按列分割为 [A1, A2, ...]
+    Splits the weight matrix along the output dimension (columns).
+    Each GPU computes a portion of the output features.
+    
+    Mathematical Formulation:
+        Y = XW where W is split as [W_1, W_2, ..., W_N]
+        Each GPU i computes Y_i = X @ W_i
+        Output is gathered if gather_output=True
     
     Args:
-        in_features: 输入特征数
-        out_features: 输出特征数（总数）
-        bias: 是否使用偏置
-        gather_output: 是否收集输出
-        config: 张量并行配置
+        in_features: Size of input features.
+        out_features: Total size of output features.
+        bias: Whether to include bias.
+        gather_output: Whether to gather output from all GPUs.
+        config: Tensor parallel configuration.
     """
     
     def __init__(
@@ -200,11 +233,9 @@ class ColumnParallelLinear(nn.Module):
         self.out_features = out_features
         self.gather_output = gather_output
         
-        # 每个 GPU 的输出特征数
         assert out_features % self.world_size == 0
         self.out_features_per_partition = out_features // self.world_size
         
-        # 初始化权重
         self.weight = nn.Parameter(
             torch.empty(self.out_features_per_partition, in_features)
         )
@@ -216,6 +247,7 @@ class ColumnParallelLinear(nn.Module):
         self.reset_parameters()
     
     def reset_parameters(self) -> None:
+        """Initialize parameters using Kaiming uniform."""
         nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
         if self.bias is not None:
             fan_in, _ = nn.init._calculate_fan_in_and_fan_out(self.weight)
@@ -223,15 +255,13 @@ class ColumnParallelLinear(nn.Module):
             nn.init.uniform_(self.bias, -bound, bound)
     
     def forward(self, input_: torch.Tensor) -> torch.Tensor:
-        # 复制输入到并行区域
+        """Forward pass with optional output gathering."""
         input_parallel = _CopyToModelParallelRegion.apply(
             input_, self.config.process_group
         )
         
-        # 本地线性计算
         output_parallel = F.linear(input_parallel, self.weight, self.bias)
         
-        # 收集输出
         if self.gather_output:
             output = _GatherFromModelParallelRegion.apply(
                 output_parallel, -1, self.config.process_group,
@@ -244,17 +274,22 @@ class ColumnParallelLinear(nn.Module):
 
 
 class RowParallelLinear(nn.Module):
-    """行并行线性层
+    """Row-parallel linear layer.
     
-    将权重矩阵按行分割，每个 GPU 计算部分输入特征的贡献。
-    Y = XA，其中 A 按行分割，X 也需要按列分割
+    Splits the weight matrix along the input dimension (rows).
+    Each GPU processes a portion of the input features.
+    
+    Mathematical Formulation:
+        Y = XW where W is split row-wise and X is split column-wise
+        Each GPU i computes Y_i = X_i @ W_i
+        Output is reduced across all GPUs
     
     Args:
-        in_features: 输入特征数（总数）
-        out_features: 输出特征数
-        bias: 是否使用偏置
-        input_is_parallel: 输入是否已经并行
-        config: 张量并行配置
+        in_features: Total size of input features.
+        out_features: Size of output features.
+        bias: Whether to include bias.
+        input_is_parallel: Whether input is already partitioned.
+        config: Tensor parallel configuration.
     """
     
     def __init__(
@@ -275,11 +310,9 @@ class RowParallelLinear(nn.Module):
         self.out_features = out_features
         self.input_is_parallel = input_is_parallel
         
-        # 每个 GPU 的输入特征数
         assert in_features % self.world_size == 0
         self.in_features_per_partition = in_features // self.world_size
         
-        # 初始化权重
         self.weight = nn.Parameter(
             torch.empty(out_features, self.in_features_per_partition)
         )
@@ -291,28 +324,26 @@ class RowParallelLinear(nn.Module):
         self.reset_parameters()
     
     def reset_parameters(self) -> None:
+        """Initialize parameters using Kaiming uniform."""
         nn.init.kaiming_uniform_(self.weight, a=math.sqrt(5))
         if self.bias is not None:
-            fan_in = self.in_features  # 使用总输入特征数
+            fan_in = self.in_features
             bound = 1 / math.sqrt(fan_in) if fan_in > 0 else 0
             nn.init.uniform_(self.bias, -bound, bound)
     
     def forward(self, input_: torch.Tensor) -> torch.Tensor:
-        # 如果输入未并行，先分割
+        """Forward pass with AllReduce for output aggregation."""
         if not self.input_is_parallel:
             input_parallel = tensor_parallel_split(input_, dim=-1, config=self.config)
         else:
             input_parallel = input_
         
-        # 本地线性计算（不加偏置）
         output_parallel = F.linear(input_parallel, self.weight)
         
-        # AllReduce 合并结果
         output = _ReduceFromModelParallelRegion.apply(
             output_parallel, self.config.process_group
         )
         
-        # 加偏置
         if self.bias is not None:
             output = output + self.bias
         
@@ -320,15 +351,21 @@ class RowParallelLinear(nn.Module):
 
 
 class VocabParallelEmbedding(nn.Module):
-    """词表并行嵌入层
+    """Vocabulary-parallel embedding layer.
     
-    将词表按行分割到多个 GPU，每个 GPU 只存储部分词向量。
+    Partitions the embedding table across GPUs, with each GPU storing
+    a subset of the vocabulary embeddings.
+    
+    Mathematical Formulation:
+        E is split row-wise: E = [E_1; E_2; ...; E_N]
+        Each GPU i stores embeddings for vocab range [start_i, end_i)
+        Lookup results are reduced across all GPUs
     
     Args:
-        num_embeddings: 词表大小（总数）
-        embedding_dim: 嵌入维度
-        padding_idx: 填充索引
-        config: 张量并行配置
+        num_embeddings: Total vocabulary size.
+        embedding_dim: Embedding dimension.
+        padding_idx: Index for padding token.
+        config: Tensor parallel configuration.
     """
     
     def __init__(
@@ -348,12 +385,10 @@ class VocabParallelEmbedding(nn.Module):
         self.embedding_dim = embedding_dim
         self.padding_idx = padding_idx
         
-        # 计算每个 GPU 的词表范围
         self.vocab_start_idx = self.rank * (num_embeddings // self.world_size)
         self.vocab_end_idx = (self.rank + 1) * (num_embeddings // self.world_size)
         self.num_embeddings_per_partition = self.vocab_end_idx - self.vocab_start_idx
         
-        # 初始化嵌入
         self.weight = nn.Parameter(
             torch.empty(self.num_embeddings_per_partition, embedding_dim)
         )
@@ -361,29 +396,24 @@ class VocabParallelEmbedding(nn.Module):
         self.reset_parameters()
     
     def reset_parameters(self) -> None:
+        """Initialize embedding weights."""
         nn.init.normal_(self.weight)
         if self.padding_idx is not None:
-            # 检查 padding_idx 是否在本分区
             if self.vocab_start_idx <= self.padding_idx < self.vocab_end_idx:
                 local_idx = self.padding_idx - self.vocab_start_idx
                 with torch.no_grad():
                     self.weight[local_idx].fill_(0)
     
     def forward(self, input_: torch.Tensor) -> torch.Tensor:
-        # 创建掩码：哪些 token 在本分区
+        """Forward pass with masked embedding lookup and reduction."""
         input_mask = (input_ >= self.vocab_start_idx) & (input_ < self.vocab_end_idx)
         
-        # 将不在本分区的索引设为 0（避免越界）
         masked_input = input_ - self.vocab_start_idx
         masked_input = masked_input.clamp(0, self.num_embeddings_per_partition - 1)
         
-        # 本地嵌入查找
         output_parallel = F.embedding(masked_input, self.weight)
-        
-        # 将不在本分区的结果置零
         output_parallel = output_parallel * input_mask.unsqueeze(-1).float()
         
-        # AllReduce 合并结果
         output = _ReduceFromModelParallelRegion.apply(
             output_parallel, self.config.process_group
         )

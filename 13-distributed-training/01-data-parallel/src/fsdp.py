@@ -1,20 +1,51 @@
 """
-Fully Sharded Data Parallel (FSDP) 实现
+Fully Sharded Data Parallel (FSDP) Implementation
 
-FSDP 是 PyTorch 的全分片数据并行实现，通过将模型参数、梯度和优化器状态
-分片到多个 GPU 上，大幅减少每个 GPU 的内存占用。
+Core Idea:
+    FSDP shards model parameters, gradients, and optimizer states across GPUs,
+    gathering them on-demand during forward/backward passes. This enables
+    training models that exceed single-GPU memory capacity.
 
-核心概念:
-    - 参数分片: 每个 GPU 只存储部分参数
-    - 按需聚合: 前向/反向传播时临时聚合完整参数
-    - 梯度分片: 反向传播后立即分片梯度
-    - 优化器状态分片: 每个 GPU 只维护部分优化器状态
+Mathematical Theory:
+    For a model with P parameters across N GPUs, memory per GPU is reduced from:
+    
+    .. math::
+        M_{DDP} = P + P + kP = (2+k)P  \\quad \\text{(params + grads + optimizer)}
+    
+    to:
+    
+    .. math::
+        M_{FSDP} = \\frac{P}{N} + \\frac{P}{N} + \\frac{kP}{N} = \\frac{(2+k)P}{N}
+    
+    where k is the optimizer state multiplier (k=2 for Adam: momentum + variance).
+
+Problem Statement:
+    Large models (billions of parameters) cannot fit on a single GPU even with
+    gradient checkpointing. FSDP solves this by distributing memory footprint
+    while maintaining data parallelism semantics.
+
+Comparison:
+    - vs DDP: FSDP shards everything, DDP replicates everything
+    - vs ZeRO-3: Equivalent memory efficiency, FSDP is PyTorch-native
+    - vs Pipeline: FSDP is data-parallel, Pipeline is model-parallel
+
+Complexity:
+    - Communication: O(P) per AllGather + O(P) per ReduceScatter per layer
+    - Memory: O(P/N) per GPU (sharded state)
+    - Computation: Same as DDP, O(B/N) per GPU
+
+References:
+    - Zhao et al., "PyTorch FSDP: Experiences on Scaling Fully Sharded Data
+      Parallel", VLDB 2023
+    - Rajbhandari et al., "ZeRO: Memory Optimizations Toward Training Trillion
+      Parameter Models", SC 2020
 """
 
 import functools
-from dataclasses import dataclass, field
+import os
+from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Any, Callable, Dict, List, Optional, Set, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Type
 
 import torch
 import torch.nn as nn
@@ -35,8 +66,6 @@ try:
     from torch.distributed.fsdp.wrap import (
         transformer_auto_wrap_policy,
         size_based_auto_wrap_policy,
-        enable_wrap,
-        wrap,
     )
     FSDP_AVAILABLE = True
 except ImportError:
@@ -44,37 +73,46 @@ except ImportError:
 
 
 class ShardingStrategy(Enum):
-    """分片策略枚举"""
-    FULL_SHARD = auto()      # 完全分片 (ZeRO-3)
-    SHARD_GRAD_OP = auto()   # 梯度和优化器状态分片 (ZeRO-2)
-    NO_SHARD = auto()        # 不分片 (DDP)
-    HYBRID_SHARD = auto()    # 混合分片
+    """FSDP sharding strategy options.
+    
+    Attributes:
+        FULL_SHARD: Shard parameters, gradients, and optimizer states (ZeRO-3).
+        SHARD_GRAD_OP: Shard gradients and optimizer states only (ZeRO-2).
+        NO_SHARD: No sharding, equivalent to DDP.
+        HYBRID_SHARD: Shard within nodes, replicate across nodes.
+    """
+    FULL_SHARD = auto()
+    SHARD_GRAD_OP = auto()
+    NO_SHARD = auto()
+    HYBRID_SHARD = auto()
 
 
 @dataclass
 class FSDPConfig:
-    """FSDP 配置类
+    """Configuration for Fully Sharded Data Parallel training.
     
     Attributes:
-        sharding_strategy: 分片策略
-        cpu_offload: 是否将参数卸载到 CPU
-        backward_prefetch: 反向传播预取策略
-        mixed_precision: 混合精度配置
-        auto_wrap_policy: 自动包装策略
-        min_num_params: 自动包装的最小参数数量
-        transformer_layer_cls: Transformer 层类（用于自动包装）
-        use_orig_params: 是否使用原始参数
-        sync_module_states: 是否同步模块状态
-        forward_prefetch: 是否启用前向预取
-        limit_all_gathers: 是否限制 AllGather 操作
-        activation_checkpointing: 是否启用激活检查点
+        sharding_strategy: How to shard model state across GPUs.
+        cpu_offload: Offload parameters to CPU when not in use.
+        backward_prefetch: Prefetch strategy for backward pass.
+        mixed_precision: Enable mixed precision training.
+        mixed_precision_dtype: Data type for mixed precision (float16/bfloat16).
+        auto_wrap_policy: Policy for automatic FSDP wrapping.
+        min_num_params: Minimum parameters for size-based wrapping.
+        transformer_layer_cls: Layer classes for transformer wrapping.
+        use_orig_params: Use original parameter references.
+        sync_module_states: Synchronize module states on initialization.
+        forward_prefetch: Enable forward pass prefetching.
+        limit_all_gathers: Limit concurrent AllGather operations.
+        activation_checkpointing: Enable gradient checkpointing.
+        activation_checkpointing_layers: Layers to apply checkpointing.
     """
     sharding_strategy: ShardingStrategy = ShardingStrategy.FULL_SHARD
     cpu_offload: bool = False
-    backward_prefetch: str = "backward_pre"  # "backward_pre", "backward_post", None
+    backward_prefetch: str = "backward_pre"
     mixed_precision: bool = False
     mixed_precision_dtype: torch.dtype = torch.float16
-    auto_wrap_policy: str = "size_based"  # "size_based", "transformer", "none"
+    auto_wrap_policy: str = "size_based"
     min_num_params: int = 100_000
     transformer_layer_cls: Optional[List[Type[nn.Module]]] = None
     use_orig_params: bool = True
@@ -86,7 +124,7 @@ class FSDPConfig:
 
 
 def _get_sharding_strategy(strategy: ShardingStrategy):
-    """转换分片策略为 PyTorch FSDP 策略"""
+    """Convert ShardingStrategy enum to PyTorch FSDP strategy."""
     if not FSDP_AVAILABLE:
         raise RuntimeError("FSDP not available in this PyTorch version")
     
@@ -100,7 +138,7 @@ def _get_sharding_strategy(strategy: ShardingStrategy):
 
 
 def _get_backward_prefetch(prefetch: Optional[str]):
-    """转换反向预取策略"""
+    """Convert backward prefetch string to PyTorch enum."""
     if not FSDP_AVAILABLE or prefetch is None:
         return None
     
@@ -111,16 +149,17 @@ def _get_backward_prefetch(prefetch: Optional[str]):
     return mapping.get(prefetch)
 
 
-def get_fsdp_wrap_policy(
-    config: FSDPConfig,
-) -> Optional[Callable]:
-    """获取 FSDP 自动包装策略
+def get_fsdp_wrap_policy(config: FSDPConfig) -> Optional[Callable]:
+    """Create FSDP auto-wrap policy based on configuration.
     
     Args:
-        config: FSDP 配置
+        config: FSDP configuration.
         
     Returns:
-        包装策略函数
+        Wrap policy function or None.
+        
+    Raises:
+        ValueError: If transformer policy specified without layer classes.
     """
     if not FSDP_AVAILABLE:
         return None
@@ -148,7 +187,7 @@ def get_fsdp_wrap_policy(
 
 
 def get_fsdp_mixed_precision(config: FSDPConfig) -> Optional[Any]:
-    """获取 FSDP 混合精度配置"""
+    """Create FSDP mixed precision configuration."""
     if not FSDP_AVAILABLE or not config.mixed_precision:
         return None
     
@@ -160,14 +199,23 @@ def get_fsdp_mixed_precision(config: FSDPConfig) -> Optional[Any]:
 
 
 class FSDPTrainer:
-    """FSDP 训练器
+    """High-level trainer for Fully Sharded Data Parallel training.
     
-    封装了 FSDP 训练的常用操作。
+    This class provides a simplified interface for FSDP training, handling
+    model wrapping, activation checkpointing, and distributed checkpointing.
+    
+    Mathematical Background:
+        FSDP reduces memory by a factor of N (number of GPUs) compared to DDP.
+        The trade-off is increased communication: each layer requires AllGather
+        before forward/backward and ReduceScatter after backward.
     
     Args:
-        model: PyTorch 模型
-        config: FSDP 配置
-        device: 训练设备
+        model: PyTorch model to be sharded.
+        config: FSDP configuration options.
+        device: Target device (auto-detected if None).
+        
+    Raises:
+        RuntimeError: If FSDP is not available (PyTorch < 1.12).
     """
     
     def __init__(
@@ -198,26 +246,26 @@ class FSDPTrainer:
         self._is_wrapped = False
     
     def wrap_model(self) -> FSDP:
-        """将模型包装为 FSDP 模型"""
+        """Wrap the model with FSDP for distributed training.
+        
+        Returns:
+            FSDP-wrapped model with configured sharding strategy.
+        """
         if self._is_wrapped:
             return self.fsdp_model
         
-        # 应用激活检查点
         if self.config.activation_checkpointing:
             self._apply_activation_checkpointing()
         
-        # 获取配置
         sharding_strategy = _get_sharding_strategy(self.config.sharding_strategy)
         backward_prefetch = _get_backward_prefetch(self.config.backward_prefetch)
         mixed_precision = get_fsdp_mixed_precision(self.config)
         auto_wrap_policy = get_fsdp_wrap_policy(self.config)
         
-        # CPU 卸载配置
         cpu_offload = None
         if self.config.cpu_offload:
             cpu_offload = CPUOffload(offload_params=True)
         
-        # 包装模型
         self.fsdp_model = FSDP(
             self.model,
             sharding_strategy=sharding_strategy,
@@ -236,10 +284,9 @@ class FSDPTrainer:
         return self.fsdp_model
     
     def _apply_activation_checkpointing(self) -> None:
-        """应用激活检查点"""
+        """Apply gradient checkpointing to reduce memory usage."""
         from torch.distributed.algorithms._checkpoint.checkpoint_wrapper import (
             checkpoint_wrapper,
-            CheckpointImpl,
             apply_activation_checkpointing,
         )
         
@@ -255,7 +302,7 @@ class FSDPTrainer:
         )
     
     def get_model(self) -> nn.Module:
-        """获取模型"""
+        """Return the FSDP-wrapped model if available, otherwise the raw model."""
         if self._is_wrapped:
             return self.fsdp_model
         return self.model
@@ -270,7 +317,7 @@ class FSDPTrainer:
         drop_last: bool = True,
         **kwargs,
     ) -> DataLoader:
-        """创建分布式数据加载器"""
+        """Create a distributed DataLoader with automatic data sharding."""
         sampler = DistributedSampler(
             dataset,
             num_replicas=self.world_size,
@@ -297,16 +344,16 @@ class FSDPTrainer:
         full_state_dict: bool = True,
         **kwargs,
     ) -> None:
-        """保存 FSDP 检查点
+        """Save FSDP checkpoint with configurable state dict type.
         
         Args:
-            path: 保存路径
-            optimizer: 优化器
-            epoch: 当前轮次
-            full_state_dict: 是否保存完整状态字典
+            path: File path for checkpoint.
+            optimizer: Optimizer state to save.
+            epoch: Current training epoch.
+            full_state_dict: If True, gather full state on rank 0; else save shards.
+            **kwargs: Additional state to include.
         """
         if full_state_dict:
-            # 保存完整状态字典（仅主进程）
             save_policy = FullStateDictConfig(offload_to_cpu=True, rank0_only=True)
             with FSDP.state_dict_type(
                 self.fsdp_model,
@@ -325,7 +372,6 @@ class FSDPTrainer:
                         checkpoint["optimizer_state_dict"] = optimizer.state_dict()
                     torch.save(checkpoint, path)
         else:
-            # 保存分片状态字典（每个进程保存自己的分片）
             save_policy = ShardedStateDictConfig(offload_to_cpu=True)
             with FSDP.state_dict_type(
                 self.fsdp_model,
@@ -347,7 +393,16 @@ class FSDPTrainer:
         optimizer: Optional[torch.optim.Optimizer] = None,
         full_state_dict: bool = True,
     ) -> Dict[str, Any]:
-        """加载 FSDP 检查点"""
+        """Load FSDP checkpoint with proper state dict handling.
+        
+        Args:
+            path: Checkpoint file path.
+            optimizer: Optimizer to restore state.
+            full_state_dict: If True, load from full checkpoint; else load shards.
+            
+        Returns:
+            Loaded checkpoint dictionary.
+        """
         if full_state_dict:
             save_policy = FullStateDictConfig(offload_to_cpu=True, rank0_only=True)
             with FSDP.state_dict_type(
@@ -360,7 +415,6 @@ class FSDPTrainer:
                 else:
                     checkpoint = {}
                 
-                # 广播检查点
                 if dist.is_initialized():
                     checkpoint_list = [checkpoint]
                     dist.broadcast_object_list(checkpoint_list, src=0)
@@ -385,7 +439,3 @@ class FSDPTrainer:
                 self.fsdp_model.load_state_dict(checkpoint["model_state_dict"])
             
             return checkpoint
-
-
-# 需要导入 os
-import os

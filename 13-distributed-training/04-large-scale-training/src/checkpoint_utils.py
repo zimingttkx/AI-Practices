@@ -1,20 +1,45 @@
 """
-分布式检查点工具
+Distributed Checkpoint Utilities
 
-提供大规模分布式训练的检查点保存和加载功能。
+Core Idea:
+    Distributed checkpointing saves model state across multiple files, one per
+    rank, enabling efficient parallel I/O and supporting models too large for
+    single-file checkpoints.
 
-核心功能:
-    - 分片检查点保存/加载
-    - 异步检查点
-    - 检查点压缩
-    - 自动恢复
+Mathematical Theory:
+    For a model with P parameters across N ranks, each rank saves P/N parameters.
+    Parallel I/O achieves throughput:
+    
+    .. math::
+        T_{\\text{total}} = N \\times T_{\\text{single}}
+    
+    where T_single is single-rank I/O throughput.
+
+Problem Statement:
+    Large models cannot be saved to single files due to memory constraints.
+    Distributed checkpointing enables saving/loading model state in parallel
+    while maintaining consistency across ranks.
+
+Comparison:
+    - Single-file: Simple but memory-limited, sequential I/O
+    - Sharded: Parallel I/O, scalable, requires coordination
+    - Async: Non-blocking, overlaps with compute, complex state management
+
+Complexity:
+    - I/O: O(P/N) per rank for parallel save/load
+    - Memory: O(P/N) per rank during checkpointing
+    - Coordination: O(1) barrier synchronization
+
+References:
+    - PyTorch Distributed Checkpoint documentation
+    - Megatron-LM checkpoint utilities
 """
 
 import os
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 import torch
 import torch.nn as nn
@@ -23,15 +48,15 @@ import torch.distributed as dist
 
 @dataclass
 class CheckpointConfig:
-    """检查点配置
+    """Configuration for distributed checkpointing.
     
     Attributes:
-        save_dir: 保存目录
-        save_interval: 保存间隔（步数）
-        keep_last_n: 保留最近 N 个检查点
-        async_save: 是否异步保存
-        use_distributed: 是否使用分布式保存
-        compression: 压缩方式 (None, "gzip", "lz4")
+        save_dir: Directory for checkpoint storage.
+        save_interval: Steps between checkpoints.
+        keep_last_n: Number of recent checkpoints to retain.
+        async_save: Enable asynchronous saving.
+        use_distributed: Enable distributed (sharded) checkpointing.
+        compression: Compression method (None, "gzip", "lz4").
     """
     save_dir: str = "./checkpoints"
     save_interval: int = 1000
@@ -42,7 +67,7 @@ class CheckpointConfig:
 
 
 class DistributedCheckpointer:
-    """分布式检查点管理器"""
+    """Manager for distributed checkpoint save and load operations."""
     
     def __init__(self, config: CheckpointConfig):
         self.config = config
@@ -62,17 +87,17 @@ class DistributedCheckpointer:
         epoch: int = 0,
         **kwargs,
     ) -> str:
-        """保存检查点
+        """Save distributed checkpoint.
         
         Args:
-            model: 模型
-            optimizer: 优化器
-            scheduler: 学习率调度器
-            step: 当前步数
-            epoch: 当前轮次
+            model: Model to checkpoint.
+            optimizer: Optional optimizer state.
+            scheduler: Optional scheduler state.
+            step: Current training step.
+            epoch: Current epoch.
             
         Returns:
-            检查点路径
+            Path to checkpoint directory.
         """
         checkpoint_dir = self.save_dir / f"checkpoint-{step}"
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -82,7 +107,6 @@ class DistributedCheckpointer:
         else:
             checkpoint_path = checkpoint_dir / "model.pt"
         
-        # 构建检查点
         checkpoint = {
             "step": step,
             "epoch": epoch,
@@ -96,30 +120,26 @@ class DistributedCheckpointer:
         if scheduler is not None:
             checkpoint["scheduler_state_dict"] = scheduler.state_dict()
         
-        # 保存
         torch.save(checkpoint, checkpoint_path)
         
-        # 保存元数据（仅主进程）
         if self._rank == 0:
             self._save_metadata(checkpoint_dir, step, epoch)
         
-        # 同步
         if dist.is_initialized():
             dist.barrier()
         
-        # 清理旧检查点
         self._cleanup_old_checkpoints(str(checkpoint_dir))
         
         return str(checkpoint_dir)
     
     def _get_model_state_dict(self, model: nn.Module) -> Dict[str, Any]:
-        """获取模型状态字典"""
+        """Extract model state dict, handling DDP wrapper."""
         if hasattr(model, "module"):
             return model.module.state_dict()
         return model.state_dict()
     
     def _save_metadata(self, checkpoint_dir: Path, step: int, epoch: int) -> None:
-        """保存元数据"""
+        """Save checkpoint metadata (rank 0 only)."""
         import json
         metadata = {
             "step": step,
@@ -130,7 +150,7 @@ class DistributedCheckpointer:
             json.dump(metadata, f)
     
     def _cleanup_old_checkpoints(self, new_checkpoint: str) -> None:
-        """清理旧检查点"""
+        """Remove old checkpoints beyond retention limit."""
         self._saved_checkpoints.append(new_checkpoint)
         
         while len(self._saved_checkpoints) > self.config.keep_last_n:
@@ -146,7 +166,7 @@ class DistributedCheckpointer:
         scheduler: Optional[Any] = None,
         strict: bool = True,
     ) -> Dict[str, Any]:
-        """加载检查点"""
+        """Load distributed checkpoint."""
         checkpoint_dir = Path(checkpoint_path)
         
         if self.config.use_distributed:
@@ -156,24 +176,21 @@ class DistributedCheckpointer:
         
         checkpoint = torch.load(file_path, map_location="cpu")
         
-        # 加载模型
         if hasattr(model, "module"):
             model.module.load_state_dict(checkpoint["model_state_dict"], strict=strict)
         else:
             model.load_state_dict(checkpoint["model_state_dict"], strict=strict)
         
-        # 加载优化器
         if optimizer is not None and "optimizer_state_dict" in checkpoint:
             optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
         
-        # 加载调度器
         if scheduler is not None and "scheduler_state_dict" in checkpoint:
             scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
         
         return checkpoint
     
     def get_latest_checkpoint(self) -> Optional[str]:
-        """获取最新检查点路径"""
+        """Get path to most recent checkpoint."""
         checkpoints = list(self.save_dir.glob("checkpoint-*"))
         if not checkpoints:
             return None
@@ -188,7 +205,7 @@ def save_distributed_checkpoint(
     optimizer: Optional[torch.optim.Optimizer] = None,
     **kwargs,
 ) -> None:
-    """保存分布式检查点（简化接口）"""
+    """Save distributed checkpoint (simplified interface)."""
     config = CheckpointConfig(save_dir=os.path.dirname(path))
     checkpointer = DistributedCheckpointer(config)
     checkpointer.save(model, optimizer, **kwargs)
@@ -200,7 +217,7 @@ def load_distributed_checkpoint(
     optimizer: Optional[torch.optim.Optimizer] = None,
     **kwargs,
 ) -> Dict[str, Any]:
-    """加载分布式检查点（简化接口）"""
+    """Load distributed checkpoint (simplified interface)."""
     config = CheckpointConfig(save_dir=os.path.dirname(path))
     checkpointer = DistributedCheckpointer(config)
     return checkpointer.load(path, model, optimizer, **kwargs)

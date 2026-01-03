@@ -1,24 +1,51 @@
 """
-DeepSpeed 配置生成器
+DeepSpeed Configuration Generator
 
-DeepSpeed 是微软开发的深度学习优化库，提供 ZeRO、混合精度、
-梯度累积等功能，用于大规模模型训练。
+Core Idea:
+    DeepSpeed is Microsoft's deep learning optimization library providing ZeRO
+    optimizer, mixed precision, gradient accumulation, and activation checkpointing
+    for efficient large-scale model training.
 
-核心功能:
-    - ZeRO 优化器 (Stage 1/2/3)
-    - 混合精度训练
-    - 梯度累积和裁剪
-    - 激活检查点
+Mathematical Theory:
+    ZeRO (Zero Redundancy Optimizer) partitions optimizer states, gradients,
+    and parameters across data parallel ranks:
+    
+    .. math::
+        \\text{Memory per GPU} = \\frac{\\Psi + \\nabla\\Psi + O_s}{N_d}
+    
+    where Psi is parameters, nabla Psi is gradients, O_s is optimizer states,
+    and N_d is data parallel degree.
+
+Problem Statement:
+    Training large models requires memory optimization beyond standard data
+    parallelism. DeepSpeed's ZeRO eliminates memory redundancy while maintaining
+    data parallel efficiency.
+
+Comparison:
+    - ZeRO-1: Partition optimizer states only
+    - ZeRO-2: Partition optimizer states + gradients
+    - ZeRO-3: Partition all (states + gradients + parameters)
+    - ZeRO-Offload: CPU/NVMe offloading for memory extension
+
+Complexity:
+    - Communication: O(Psi) per step (same as DDP for ZeRO-1/2)
+    - Memory: O(Psi/N) for ZeRO-3 vs O(Psi) for DDP
+    - Compute: Minimal overhead from partitioning
+
+References:
+    - Rajbhandari et al., "ZeRO: Memory Optimizations Toward Training Trillion
+      Parameter Models", SC 2020
+    - DeepSpeed documentation: https://www.deepspeed.ai/
 """
 
 import json
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass
 from enum import IntEnum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional
 
 
 class ZeROStage(IntEnum):
-    """ZeRO 阶段"""
+    """ZeRO optimization stages."""
     DISABLED = 0
     OPTIMIZER_STATES = 1
     GRADIENTS = 2
@@ -27,18 +54,23 @@ class ZeROStage(IntEnum):
 
 @dataclass
 class DeepSpeedConfig:
-    """DeepSpeed 配置
+    """Configuration for DeepSpeed training.
     
     Attributes:
-        train_batch_size: 全局批次大小
-        train_micro_batch_size_per_gpu: 每 GPU 微批次大小
-        gradient_accumulation_steps: 梯度累积步数
-        gradient_clipping: 梯度裁剪值
-        zero_stage: ZeRO 阶段
-        fp16_enabled: 是否启用 FP16
-        bf16_enabled: 是否启用 BF16
-        offload_optimizer: 是否卸载优化器到 CPU
-        offload_param: 是否卸载参数到 CPU
+        train_batch_size: Global batch size across all GPUs.
+        train_micro_batch_size_per_gpu: Micro-batch size per GPU.
+        gradient_accumulation_steps: Steps to accumulate before update.
+        gradient_clipping: Maximum gradient norm.
+        zero_stage: ZeRO optimization stage (0-3).
+        fp16_enabled: Enable FP16 mixed precision.
+        bf16_enabled: Enable BF16 mixed precision.
+        offload_optimizer: Offload optimizer states to CPU.
+        offload_param: Offload parameters to CPU (ZeRO-3).
+        optimizer_type: Optimizer type (AdamW, Adam, etc.).
+        learning_rate: Learning rate.
+        weight_decay: Weight decay coefficient.
+        warmup_steps: Learning rate warmup steps.
+        activation_checkpointing: Enable activation checkpointing.
     """
     train_batch_size: int = 32
     train_micro_batch_size_per_gpu: int = 4
@@ -63,14 +95,17 @@ def get_zero_config(
     reduce_bucket_size: int = 500_000_000,
     allgather_bucket_size: int = 500_000_000,
 ) -> Dict[str, Any]:
-    """生成 ZeRO 配置
+    """Generate ZeRO optimization configuration.
     
     Args:
-        stage: ZeRO 阶段 (0-3)
-        offload_optimizer: 卸载优化器到 CPU
-        offload_param: 卸载参数到 CPU
-        reduce_bucket_size: 归约桶大小
-        allgather_bucket_size: AllGather 桶大小
+        stage: ZeRO stage (0-3).
+        offload_optimizer: Offload optimizer states to CPU.
+        offload_param: Offload parameters to CPU.
+        reduce_bucket_size: Bucket size for gradient reduction.
+        allgather_bucket_size: Bucket size for AllGather operations.
+        
+    Returns:
+        ZeRO configuration dictionary.
     """
     config = {
         "stage": stage,
@@ -110,7 +145,7 @@ def get_optimizer_config(
     betas: tuple = (0.9, 0.999),
     eps: float = 1e-8,
 ) -> Dict[str, Any]:
-    """生成优化器配置"""
+    """Generate optimizer configuration."""
     return {
         "type": optimizer_type,
         "params": {
@@ -127,7 +162,7 @@ def get_scheduler_config(
     warmup_steps: int = 1000,
     total_steps: int = 100000,
 ) -> Dict[str, Any]:
-    """生成学习率调度器配置"""
+    """Generate learning rate scheduler configuration."""
     return {
         "type": scheduler_type,
         "params": {
@@ -147,7 +182,7 @@ def get_fp16_config(
     hysteresis: int = 2,
     min_loss_scale: float = 1,
 ) -> Dict[str, Any]:
-    """生成 FP16 配置"""
+    """Generate FP16 mixed precision configuration."""
     return {
         "enabled": enabled,
         "loss_scale": loss_scale,
@@ -159,7 +194,7 @@ def get_fp16_config(
 
 
 def get_bf16_config(enabled: bool = True) -> Dict[str, Any]:
-    """生成 BF16 配置"""
+    """Generate BF16 mixed precision configuration."""
     return {"enabled": enabled}
 
 
@@ -168,7 +203,7 @@ def get_activation_checkpointing_config(
     contiguous_memory_optimization: bool = True,
     cpu_checkpointing: bool = False,
 ) -> Dict[str, Any]:
-    """生成激活检查点配置"""
+    """Generate activation checkpointing configuration."""
     return {
         "partition_activations": partition_activations,
         "contiguous_memory_optimization": contiguous_memory_optimization,
@@ -177,13 +212,13 @@ def get_activation_checkpointing_config(
 
 
 def create_deepspeed_config(config: DeepSpeedConfig) -> Dict[str, Any]:
-    """从 DeepSpeedConfig 创建完整配置字典
+    """Create complete DeepSpeed configuration dictionary.
     
     Args:
-        config: DeepSpeed 配置对象
+        config: DeepSpeed configuration object.
         
     Returns:
-        DeepSpeed JSON 配置字典
+        Complete DeepSpeed JSON configuration dictionary.
     """
     ds_config = {
         "train_batch_size": config.train_batch_size,
@@ -194,26 +229,22 @@ def create_deepspeed_config(config: DeepSpeedConfig) -> Dict[str, Any]:
         "wall_clock_breakdown": False,
     }
     
-    # ZeRO 配置
     ds_config["zero_optimization"] = get_zero_config(
         stage=config.zero_stage,
         offload_optimizer=config.offload_optimizer,
         offload_param=config.offload_param,
     )
     
-    # 优化器配置
     ds_config["optimizer"] = get_optimizer_config(
         optimizer_type=config.optimizer_type,
         learning_rate=config.learning_rate,
         weight_decay=config.weight_decay,
     )
     
-    # 学习率调度器
     ds_config["scheduler"] = get_scheduler_config(
         warmup_steps=config.warmup_steps,
     )
     
-    # 混合精度配置
     if config.bf16_enabled:
         ds_config["bf16"] = get_bf16_config(enabled=True)
         ds_config["fp16"] = {"enabled": False}
@@ -221,7 +252,6 @@ def create_deepspeed_config(config: DeepSpeedConfig) -> Dict[str, Any]:
         ds_config["fp16"] = get_fp16_config(enabled=True)
         ds_config["bf16"] = {"enabled": False}
     
-    # 激活检查点
     if config.activation_checkpointing:
         ds_config["activation_checkpointing"] = get_activation_checkpointing_config()
     
@@ -229,12 +259,12 @@ def create_deepspeed_config(config: DeepSpeedConfig) -> Dict[str, Any]:
 
 
 def save_deepspeed_config(config: Dict[str, Any], path: str) -> None:
-    """保存 DeepSpeed 配置到 JSON 文件"""
+    """Save DeepSpeed configuration to JSON file."""
     with open(path, "w") as f:
         json.dump(config, f, indent=2)
 
 
 def load_deepspeed_config(path: str) -> Dict[str, Any]:
-    """从 JSON 文件加载 DeepSpeed 配置"""
+    """Load DeepSpeed configuration from JSON file."""
     with open(path, "r") as f:
         return json.load(f)

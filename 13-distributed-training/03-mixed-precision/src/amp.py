@@ -1,18 +1,43 @@
 """
-自动混合精度 (AMP) 训练实现
+Automatic Mixed Precision (AMP) Training Implementation
 
-AMP 通过在前向传播中使用低精度（FP16/BF16），在反向传播中使用高精度（FP32），
-来加速训练并减少内存占用，同时保持模型精度。
+Core Idea:
+    AMP accelerates training by using lower precision (FP16/BF16) for forward
+    pass computations while maintaining FP32 for gradient accumulation and
+    weight updates, reducing memory and increasing throughput.
 
-核心概念:
-    - autocast: 自动选择合适的精度
-    - GradScaler: 梯度缩放防止下溢
-    - 白名单/黑名单: 控制哪些操作使用低精度
+Mathematical Theory:
+    FP16 has limited dynamic range [6e-5, 65504]. Loss scaling prevents
+    gradient underflow by multiplying loss before backward:
+    
+    .. math::
+        \\tilde{L} = s \\cdot L, \\quad \\tilde{g} = s \\cdot g, \\quad g = \\tilde{g} / s
+    
+    where s is the scale factor, dynamically adjusted based on overflow.
+
+Problem Statement:
+    FP16 training suffers from gradient underflow (small gradients become zero)
+    and overflow (large values exceed FP16 range). AMP with loss scaling
+    addresses these issues while maintaining training stability.
+
+Comparison:
+    - FP32: Full precision, baseline memory and speed
+    - FP16 + AMP: ~2x memory reduction, ~2x speedup on Tensor Cores
+    - BF16: Same range as FP32, no scaling needed, requires Ampere+
+
+Complexity:
+    - Memory: ~50% reduction for activations and gradients
+    - Compute: ~2x speedup on Tensor Core operations
+    - Overhead: Minimal from autocast and scaling operations
+
+References:
+    - Micikevicius et al., "Mixed Precision Training", ICLR 2018
+    - NVIDIA Apex documentation
 """
 
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Any, Dict, Generator, Optional, Union
+from typing import Any, Dict, Generator, Optional
 
 import torch
 import torch.nn as nn
@@ -21,18 +46,18 @@ from torch.cuda.amp import autocast, GradScaler
 
 @dataclass
 class AMPConfig:
-    """AMP 配置类
+    """Configuration for automatic mixed precision training.
     
     Attributes:
-        enabled: 是否启用 AMP
-        dtype: 混合精度数据类型 (float16, bfloat16)
-        cache_enabled: 是否启用 autocast 缓存
-        use_grad_scaler: 是否使用梯度缩放器
-        init_scale: 初始缩放因子
-        growth_factor: 缩放因子增长率
-        backoff_factor: 缩放因子回退率
-        growth_interval: 增长间隔
-        max_scale: 最大缩放因子
+        enabled: Enable AMP training.
+        dtype: Mixed precision dtype (float16 or bfloat16).
+        cache_enabled: Enable autocast kernel caching.
+        use_grad_scaler: Enable gradient scaling for FP16.
+        init_scale: Initial loss scale factor.
+        growth_factor: Scale increase multiplier.
+        backoff_factor: Scale decrease multiplier on overflow.
+        growth_interval: Steps between scale increases.
+        max_scale: Maximum allowed scale factor.
     """
     enabled: bool = True
     dtype: torch.dtype = torch.float16
@@ -46,13 +71,13 @@ class AMPConfig:
 
 
 def get_autocast_dtype(dtype_str: str = "float16") -> torch.dtype:
-    """获取 autocast 数据类型
+    """Convert string to torch dtype for autocast.
     
     Args:
-        dtype_str: 数据类型字符串
+        dtype_str: Dtype string ("float16", "fp16", "bfloat16", "bf16").
         
     Returns:
-        torch.dtype
+        Corresponding torch.dtype.
     """
     dtype_map = {
         "float16": torch.float16,
@@ -70,13 +95,13 @@ def autocast_context(
     enabled: bool = True,
     cache_enabled: bool = True,
 ) -> Generator[None, None, None]:
-    """autocast 上下文管理器
+    """Context manager for automatic mixed precision.
     
     Args:
-        device_type: 设备类型 ("cuda", "cpu")
-        dtype: 数据类型
-        enabled: 是否启用
-        cache_enabled: 是否启用缓存
+        device_type: Device type ("cuda" or "cpu").
+        dtype: Target dtype for autocast.
+        enabled: Whether autocast is enabled.
+        cache_enabled: Whether to cache autocast kernels.
     """
     with autocast(
         device_type=device_type,
@@ -88,14 +113,15 @@ def autocast_context(
 
 
 class AMPTrainer:
-    """AMP 训练器
+    """Trainer with automatic mixed precision support.
     
-    封装了 AMP 训练的常用操作。
+    Encapsulates autocast context and gradient scaling for simplified
+    mixed precision training workflow.
     
     Args:
-        model: PyTorch 模型
-        config: AMP 配置
-        device: 训练设备
+        model: PyTorch model to train.
+        config: AMP configuration.
+        device: Target device for training.
     """
     
     def __init__(
@@ -113,7 +139,6 @@ class AMPTrainer:
         
         self.model = model.to(self.device)
         
-        # 初始化梯度缩放器
         self.scaler = None
         if self.config.use_grad_scaler and self.config.enabled:
             self.scaler = GradScaler(
@@ -125,7 +150,7 @@ class AMPTrainer:
             )
     
     def autocast(self) -> autocast:
-        """获取 autocast 上下文"""
+        """Get autocast context manager."""
         return autocast(
             device_type=self.device_type,
             dtype=self.config.dtype,
@@ -134,19 +159,19 @@ class AMPTrainer:
         )
     
     def forward(self, *args, **kwargs) -> Any:
-        """带 autocast 的前向传播"""
+        """Forward pass with autocast enabled."""
         with self.autocast():
             return self.model(*args, **kwargs)
     
     def backward(self, loss: torch.Tensor) -> None:
-        """带梯度缩放的反向传播"""
+        """Backward pass with gradient scaling."""
         if self.scaler is not None:
             self.scaler.scale(loss).backward()
         else:
             loss.backward()
     
     def step(self, optimizer: torch.optim.Optimizer) -> None:
-        """带梯度缩放的优化器步骤"""
+        """Optimizer step with gradient unscaling and scale update."""
         if self.scaler is not None:
             self.scaler.step(optimizer)
             self.scaler.update()
@@ -154,7 +179,7 @@ class AMPTrainer:
             optimizer.step()
     
     def unscale_gradients(self, optimizer: torch.optim.Optimizer) -> None:
-        """反缩放梯度（用于梯度裁剪）"""
+        """Unscale gradients before gradient clipping."""
         if self.scaler is not None:
             self.scaler.unscale_(optimizer)
     
@@ -163,7 +188,7 @@ class AMPTrainer:
         max_norm: float,
         norm_type: float = 2.0,
     ) -> torch.Tensor:
-        """梯度裁剪"""
+        """Clip gradients by global norm."""
         return torch.nn.utils.clip_grad_norm_(
             self.model.parameters(),
             max_norm=max_norm,
@@ -171,20 +196,20 @@ class AMPTrainer:
         )
     
     def get_scale(self) -> float:
-        """获取当前缩放因子"""
+        """Get current loss scale factor."""
         if self.scaler is not None:
             return self.scaler.get_scale()
         return 1.0
     
     def state_dict(self) -> Dict[str, Any]:
-        """获取状态字典"""
+        """Get trainer state for checkpointing."""
         state = {"model": self.model.state_dict()}
         if self.scaler is not None:
             state["scaler"] = self.scaler.state_dict()
         return state
     
     def load_state_dict(self, state: Dict[str, Any]) -> None:
-        """加载状态字典"""
+        """Load trainer state from checkpoint."""
         self.model.load_state_dict(state["model"])
         if self.scaler is not None and "scaler" in state:
             self.scaler.load_state_dict(state["scaler"])

@@ -1,34 +1,59 @@
 """
-Megatron-Core 集成
+Megatron-Core Integration
 
-Megatron-LM 是 NVIDIA 开发的大规模 Transformer 训练框架，
-提供高效的模型并行和数据并行实现。
+Core Idea:
+    Megatron-LM is NVIDIA's framework for training large Transformer models,
+    providing efficient tensor, pipeline, and sequence parallelism with
+    optimized communication patterns.
 
-核心功能:
-    - 张量并行 (Tensor Parallelism)
-    - 流水线并行 (Pipeline Parallelism)
-    - 序列并行 (Sequence Parallelism)
-    - 分布式优化器
+Mathematical Theory:
+    3D parallelism combines data (D), tensor (T), and pipeline (P) parallelism:
+    
+    .. math::
+        N_{\\text{total}} = D \\times T \\times P
+    
+    Each GPU is identified by a unique (d, t, p) coordinate in the 3D mesh.
+    Communication groups are formed along each dimension.
+
+Problem Statement:
+    Training trillion-parameter models requires distributing computation across
+    thousands of GPUs. Megatron provides the infrastructure for managing
+    complex parallel topologies and communication patterns.
+
+Comparison:
+    - vs PyTorch DDP: Adds tensor and pipeline parallelism
+    - vs DeepSpeed: More focus on model parallelism, less on memory optimization
+    - vs FairScale: Native NVIDIA optimization, better Tensor Core utilization
+
+Complexity:
+    - Communication: O(B*H/T) for tensor parallel, O(B*H) for pipeline
+    - Memory: O(P/T) per GPU for model parameters
+    - Initialization: O(N) for creating process groups
+
+References:
+    - Shoeybi et al., "Megatron-LM: Training Multi-Billion Parameter Language
+      Models Using Model Parallelism", arXiv 2019
+    - Narayanan et al., "Efficient Large-Scale Language Model Training on GPU
+      Clusters Using Megatron-LM", SC 2021
 """
 
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Optional
 
-import torch
 import torch.distributed as dist
 
 
 @dataclass
 class MegatronConfig:
-    """Megatron 配置
+    """Configuration for Megatron parallelism.
     
     Attributes:
-        tensor_model_parallel_size: 张量并行大小
-        pipeline_model_parallel_size: 流水线并行大小
-        data_parallel_size: 数据并行大小
-        sequence_parallel: 是否启用序列并行
-        virtual_pipeline_model_parallel_size: 虚拟流水线大小
-        context_parallel_size: 上下文并行大小
+        tensor_model_parallel_size: Tensor parallelism degree.
+        pipeline_model_parallel_size: Pipeline parallelism degree.
+        data_parallel_size: Data parallelism degree.
+        sequence_parallel: Enable sequence parallelism.
+        virtual_pipeline_model_parallel_size: Virtual pipeline stages.
+        context_parallel_size: Context parallelism degree.
     """
     tensor_model_parallel_size: int = 1
     pipeline_model_parallel_size: int = 1
@@ -39,9 +64,10 @@ class MegatronConfig:
 
 
 class MegatronParallelState:
-    """Megatron 并行状态管理
+    """Singleton managing Megatron parallel state and process groups.
     
-    管理各种并行组和排名信息。
+    Manages tensor, pipeline, and data parallel groups along with
+    rank information for each parallelism dimension.
     """
     
     _instance = None
@@ -72,7 +98,7 @@ class MegatronParallelState:
         self._initialized = False
     
     def initialize(self, config: MegatronConfig) -> None:
-        """初始化并行状态"""
+        """Initialize parallel state with given configuration."""
         if not dist.is_initialized():
             self._initialized = True
             return
@@ -86,13 +112,8 @@ class MegatronParallelState:
         
         assert world_size == tp_size * pp_size * dp_size
         
-        # 创建张量并行组
         self._create_tensor_parallel_groups(rank, world_size, tp_size, pp_size, dp_size)
-        
-        # 创建流水线并行组
         self._create_pipeline_parallel_groups(rank, world_size, tp_size, pp_size, dp_size)
-        
-        # 创建数据并行组
         self._create_data_parallel_groups(rank, world_size, tp_size, pp_size, dp_size)
         
         self._tensor_model_parallel_world_size = tp_size
@@ -104,7 +125,7 @@ class MegatronParallelState:
     def _create_tensor_parallel_groups(
         self, rank: int, world_size: int, tp_size: int, pp_size: int, dp_size: int
     ) -> None:
-        """创建张量并行组"""
+        """Create tensor model parallel groups."""
         num_tp_groups = world_size // tp_size
         
         for i in range(num_tp_groups):
@@ -117,9 +138,7 @@ class MegatronParallelState:
     def _create_pipeline_parallel_groups(
         self, rank: int, world_size: int, tp_size: int, pp_size: int, dp_size: int
     ) -> None:
-        """创建流水线并行组"""
-        num_pp_groups = world_size // pp_size
-        
+        """Create pipeline model parallel groups."""
         for i in range(dp_size):
             for j in range(tp_size):
                 ranks = [i * tp_size * pp_size + j + k * tp_size for k in range(pp_size)]
@@ -131,7 +150,7 @@ class MegatronParallelState:
     def _create_data_parallel_groups(
         self, rank: int, world_size: int, tp_size: int, pp_size: int, dp_size: int
     ) -> None:
-        """创建数据并行组"""
+        """Create data parallel groups."""
         for i in range(pp_size):
             for j in range(tp_size):
                 ranks = [i * tp_size + j + k * tp_size * pp_size for k in range(dp_size)]
@@ -142,67 +161,78 @@ class MegatronParallelState:
     
     @property
     def tensor_model_parallel_group(self):
+        """Get tensor model parallel process group."""
         return self._tensor_model_parallel_group
     
     @property
     def pipeline_model_parallel_group(self):
+        """Get pipeline model parallel process group."""
         return self._pipeline_model_parallel_group
     
     @property
     def data_parallel_group(self):
+        """Get data parallel process group."""
         return self._data_parallel_group
     
     @property
     def tensor_model_parallel_rank(self) -> int:
+        """Get rank within tensor model parallel group."""
         return self._tensor_model_parallel_rank
     
     @property
     def pipeline_model_parallel_rank(self) -> int:
+        """Get rank within pipeline model parallel group."""
         return self._pipeline_model_parallel_rank
     
     @property
     def data_parallel_rank(self) -> int:
+        """Get rank within data parallel group."""
         return self._data_parallel_rank
     
     @property
     def tensor_model_parallel_world_size(self) -> int:
+        """Get tensor model parallel world size."""
         return self._tensor_model_parallel_world_size
     
     @property
     def pipeline_model_parallel_world_size(self) -> int:
+        """Get pipeline model parallel world size."""
         return self._pipeline_model_parallel_world_size
     
     @property
     def data_parallel_world_size(self) -> int:
+        """Get data parallel world size."""
         return self._data_parallel_world_size
     
     def is_pipeline_first_stage(self) -> bool:
+        """Check if current rank is first pipeline stage."""
         return self._pipeline_model_parallel_rank == 0
     
     def is_pipeline_last_stage(self) -> bool:
+        """Check if current rank is last pipeline stage."""
         return self._pipeline_model_parallel_rank == self._pipeline_model_parallel_world_size - 1
 
 
 def initialize_megatron(config: MegatronConfig) -> MegatronParallelState:
-    """初始化 Megatron 并行环境"""
+    """Initialize Megatron parallel environment."""
     state = MegatronParallelState()
     state.initialize(config)
     return state
 
 
 def get_model_parallel_group():
-    """获取模型并行组"""
+    """Get tensor model parallel process group."""
     state = MegatronParallelState()
     return state.tensor_model_parallel_group
 
 
 def get_data_parallel_group():
-    """获取数据并行组"""
+    """Get data parallel process group."""
     state = MegatronParallelState()
     return state.data_parallel_group
 
 
 def get_pipeline_parallel_group():
-    """获取流水线并行组"""
+    """Get pipeline model parallel process group."""
     state = MegatronParallelState()
     return state.pipeline_model_parallel_group
