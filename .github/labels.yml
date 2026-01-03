@@ -133,6 +133,18 @@
   color: "c5def5"
   description: "Practical Projects module"
 
+- name: "module: llm"
+  color: "c5def5"
+  description: "Large Language Models module"
+
+- name: "module: multimodal"
+  color: "c5def5"
+  description: "Multimodal Learning module"
+
+- name: "module: deployment"
+  color: "c5def5"
+  description: "Deployment Optimization module"
+
 # Other
 - name: "question"
   color: "d876e3"

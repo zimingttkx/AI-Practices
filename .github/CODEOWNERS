@@ -23,6 +23,9 @@
 /07-reinforcement-learning/ @zimingttkx
 /08-theory-notes/           @zimingttkx
 /09-practical-projects/     @zimingttkx
+/10-large-language-models/  @zimingttkx
+/11-multimodal-learning/    @zimingttkx
+/12-deployment-optimization/ @zimingttkx
 
 # Utilities
 /utils/                     @zimingttkx
@@ -31,3 +34,4 @@
 /requirements.txt           @zimingttkx
 /environment.yml            @zimingttkx
 /package.json               @zimingttkx
+/pyproject.toml             @zimingttkx
