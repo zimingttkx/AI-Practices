@@ -19,7 +19,7 @@
 
 **From Theory to Practice, Build a Complete AI Knowledge System**
 
-*Machine Learning • Deep Learning • Computer Vision • NLP • Generative AI • Reinforcement Learning*
+*Machine Learning • Deep Learning • Computer Vision • NLP • LLM • Multimodal • Reinforcement Learning*
 
 </div>
 
@@ -29,9 +29,9 @@
 
 <div align="center">
 
-| 📚 **250+ Notebooks** | 🧩 **12 Core Modules** | 📝 **600+ Python Files** | 💻 **200k+ LOC** | 🏆 **2 Kaggle Golds** |
-|:---------------------:|:---------------------:|:------------------------:|:----------------:|:---------------------:|
-| Reproducible Experiments | Systematic Learning Path | Production-Ready Code | Deep Coverage | Competition Verified |
+| **300+ Notebooks** | **12 Core Modules** | **1000+ Unit Tests** | **Production-Ready** | **2 Kaggle Golds** |
+|:------------------:|:-------------------:|:--------------------:|:--------------------:|:------------------:|
+| Reproducible Experiments | Systematic Learning Path | Quality Assurance | Engineering Practice | Competition Verified |
 
 </div>
 
@@ -253,7 +253,7 @@ $$Q^*(s, a) = \mathbb{E}\left[r + \gamma \max_{a'} Q^*(s', a') \mid s, a\right]$
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Clone repository
@@ -282,16 +282,16 @@ jupyter lab
 
 ---
 
-## 🏆 Competition Results
+## Competition Results
 
 <div align="center">
 
 | Competition | Rank | Medal | Year |
 |:------------|:----:|:-----:|:----:|
-| **Feedback Prize - ELL** | Top 1% | 🥇 Gold | 2023 |
-| **RSNA Abdominal Trauma** | Top 1% | 🥇 Gold | 2023 |
-| American Express Default | Top 5% | 🥈 Silver | 2022 |
-| RSNA Lumbar Spine | Top 10% | 🥉 Bronze | 2024 |
+| **Feedback Prize - ELL** | Top 1% | Gold | 2023 |
+| **RSNA Abdominal Trauma** | Top 1% | Gold | 2023 |
+| American Express Default | Top 5% | Silver | 2022 |
+| RSNA Lumbar Spine | Top 10% | Bronze | 2024 |
 
 </div>
 
@@ -319,7 +319,7 @@ This project is licensed under the **MIT License** - see [LICENSE](LICENSE) for 
 
 <div align="center">
 
-**If this project helps you, please give it a ⭐ Star!**
+**If this project helps you, please give it a Star!**
 
 [![Report Bug](https://img.shields.io/badge/Report-Bug-red?style=for-the-badge)](https://github.com/zimingttkx/AI-Practices/issues)
 [![Request Feature](https://img.shields.io/badge/Request-Feature-blue?style=for-the-badge)](https://github.com/zimingttkx/AI-Practices/issues)

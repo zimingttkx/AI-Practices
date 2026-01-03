@@ -19,7 +19,7 @@
 
 **从理论到实战，构建完整的AI知识体系**
 
-*Machine Learning • Deep Learning • Computer Vision • NLP • Generative AI • Reinforcement Learning*
+*Machine Learning • Deep Learning • Computer Vision • NLP • LLM • Multimodal • Reinforcement Learning*
 
 </div>
 
@@ -29,9 +29,9 @@
 
 <div align="center">
 
-| 📚 **250+ Notebooks** | 🧩 **12大核心模块** | 📝 **600+ Python文件** | 💻 **200k+ 代码行** | 🏆 **2枚Kaggle金牌** |
-|:---------------------:|:------------------:|:----------------------:|:-------------------:|:--------------------:|
-| 可复现实验 | 系统化学习路径 | 生产级代码 | 深度覆盖 | 竞赛验证 |
+| **300+ Notebooks** | **12大核心模块** | **1000+ 单元测试** | **生产级代码** | **2枚Kaggle金牌** |
+|:------------------:|:----------------:|:-----------------:|:-------------:|:----------------:|
+| 可复现实验 | 系统化学习路径 | 质量保证 | 工程实践 | 竞赛验证 |
 
 </div>
 
@@ -253,7 +253,7 @@ $$Q^*(s, a) = \mathbb{E}\left[r + \gamma \max_{a'} Q^*(s', a') \mid s, a\right]$
 
 ---
 
-## 🚀 快速开始
+## 快速开始
 
 ```bash
 # 克隆仓库
@@ -282,16 +282,16 @@ jupyter lab
 
 ---
 
-## 🏆 竞赛成绩
+## 竞赛成绩
 
 <div align="center">
 
 | 竞赛 | 排名 | 奖牌 | 年份 |
 |:-----|:----:|:----:|:----:|
-| **Feedback Prize - ELL** | Top 1% | 🥇 金牌 | 2023 |
-| **RSNA Abdominal Trauma** | Top 1% | 🥇 金牌 | 2023 |
-| American Express Default | Top 5% | 🥈 银牌 | 2022 |
-| RSNA Lumbar Spine | Top 10% | 🥉 铜牌 | 2024 |
+| **Feedback Prize - ELL** | Top 1% | 金牌 | 2023 |
+| **RSNA Abdominal Trauma** | Top 1% | 金牌 | 2023 |
+| American Express Default | Top 5% | 银牌 | 2022 |
+| RSNA Lumbar Spine | Top 10% | 铜牌 | 2024 |
 
 </div>
 
@@ -319,7 +319,7 @@ jupyter lab
 
 <div align="center">
 
-**如果这个项目对你有帮助，请给一个 ⭐ Star！**
+**如果这个项目对你有帮助，请给一个 Star！**
 
 [![Report Bug](https://img.shields.io/badge/Report-Bug-red?style=for-the-badge)](https://github.com/zimingttkx/AI-Practices/issues)
 [![Request Feature](https://img.shields.io/badge/Request-Feature-blue?style=for-the-badge)](https://github.com/zimingttkx/AI-Practices/issues)
