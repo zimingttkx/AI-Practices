@@ -15,7 +15,6 @@ MNIST卷积神经网络模型定义
     3. 支持模型保存和加载
     4. 提供预测概率接口
 
-作者: Deep Learning Research Team
 日期: 2024-01
 """
 

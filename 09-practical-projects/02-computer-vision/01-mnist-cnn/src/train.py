@@ -20,7 +20,6 @@ MNIST模型训练脚本
     - 模型保存和性能评估
     - 完整的训练日志
 
-作者: Deep Learning Research Team
 日期: 2024-01
 """
 

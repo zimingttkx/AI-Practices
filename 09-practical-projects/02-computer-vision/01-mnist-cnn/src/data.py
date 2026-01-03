@@ -9,7 +9,6 @@ MNIST数据加载和预处理模块
     - 数据增强策略
     - 数据分布统计
 
-作者: Deep Learning Research Team
 日期: 2024-01
 """
 
