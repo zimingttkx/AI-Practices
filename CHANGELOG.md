@@ -7,18 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Planned
+- 13-distributed-training module (DDP, FSDP, ZeRO, Megatron-LM)
+
+## [2.0.0] - 2026-01-03
+
 ### Added
-- VitePress documentation site with bilingual support (zh/en)
-- GitHub Wiki with comprehensive documentation
-- CONTRIBUTING.md guidelines
-- CHANGELOG.md for version tracking
-- Dependabot configuration for automated updates
-- CODEOWNERS for code review workflow
+- **10-large-language-models**: Complete LLM module
+  - Transformer architecture and tokenizers
+  - GPT/BERT/LLaMA implementations
+  - LoRA/QLoRA fine-tuning
+  - Prompt engineering techniques
+  - RAG (Retrieval-Augmented Generation)
+  - Agent systems with tool calling
+  - RLHF/DPO alignment training
+- **11-multimodal-learning**: Multimodal AI module
+  - Vision-language models (CLIP, BLIP, LLaVA)
+  - Image generation (VAE, Diffusion, Stable Diffusion, ControlNet)
+  - Audio models (Whisper ASR, TTS, HiFi-GAN)
+- **12-deployment-optimization**: Production deployment module
+  - Model optimization (quantization, pruning, distillation, ONNX)
+  - Inference engines (TensorRT, vLLM, Triton)
+  - Serving systems (FastAPI, gRPC, load balancing)
+  - MLOps (experiment tracking, model registry, monitoring)
+- 1000+ unit tests across all modules
+- Multi-stage Dockerfile with dev/prod/jupyter/test targets
+- docker-compose.yml for container orchestration
+- GitHub Actions CI/CD pipeline (ci-test.yml)
+- pyproject.toml with modern Python packaging
 
 ### Changed
-- Upgraded documentation from static HTML to VitePress
-- Improved GitHub issue templates with better categorization
-- Enhanced .gitignore with Node.js and VitePress patterns
+- Upgraded project structure to 12 core modules
+- Enhanced DEVELOPMENT.md with comprehensive coding guidelines
+- Updated requirements.txt with new dependencies
+- Improved test coverage configuration in pyproject.toml
 
 ## [1.0.0] - 2024-12-13
 
@@ -42,14 +64,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **08-theory-notes**: Mathematical foundations
 - **09-practical-projects**: End-to-end ML projects
 
-### Projects Included
-- ML Basics: 4 projects
-- Computer Vision: 1 project
-- NLP: 4 projects
-- Time Series: 2 projects
-- Kaggle Competitions: 4 solutions
-
 ---
 
-[Unreleased]: https://github.com/zimingttkx/AI-Practices/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/zimingttkx/AI-Practices/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/zimingttkx/AI-Practices/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/zimingttkx/AI-Practices/releases/tag/v1.0.0
