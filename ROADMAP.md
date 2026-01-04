@@ -1,6 +1,6 @@
 # AI-Practices 项目路线图
 
-> **最后更新**: 2026-01-03 | **当前阶段**: Phase 6 - 分布式训练与扩展 (已完成)
+> **最后更新**: 2026-01-04 | **当前阶段**: Phase 7 - AI Agents 与推理系统 (进行中)
 
 ---
 
@@ -21,10 +21,233 @@
 | 11-multimodal-learning | 完成 | 100% |
 | 12-deployment-optimization | 完成 | 100% |
 | 13-distributed-training | 完成 | 100% |
+| **14-agents-reasoning** | **进行中** | **50%** |
 
 ---
 
-## 一、已完成模块：11-multimodal-learning
+## 一、当前模块：14-agents-reasoning (Phase 7)
+
+### 模块结构
+
+```
+14-agents-reasoning/
+├── 01-tool-use/                  # 工具调用 🚧
+│   ├── src/
+│   │   ├── function_calling.py   # Function Calling 实现
+│   │   ├── tool_registry.py      # 工具注册与管理
+│   │   ├── tool_executor.py      # 工具执行引擎
+│   │   └── structured_output.py  # 结构化输出解析
+│   ├── notebooks/
+│   │   ├── 01_FunctionCalling_tutorial.ipynb
+│   │   ├── 02_ToolRegistry_tutorial.ipynb
+│   │   └── 03_StructuredOutput_tutorial.ipynb
+│   ├── tests/
+│   └── README.md
+│
+├── 02-reasoning/                 # 推理策略 🚧
+│   ├── src/
+│   │   ├── chain_of_thought.py   # 思维链 (CoT)
+│   │   ├── react.py              # ReAct: 推理+行动
+│   │   ├── tree_of_thoughts.py   # 思维树 (ToT)
+│   │   ├── self_consistency.py   # 自一致性采样
+│   │   └── reflection.py         # 反思与自我纠错
+│   ├── notebooks/
+│   │   ├── 01_ChainOfThought_tutorial.ipynb
+│   │   ├── 02_ReAct_tutorial.ipynb
+│   │   ├── 03_TreeOfThoughts_tutorial.ipynb
+│   │   └── 04_Reflection_tutorial.ipynb
+│   ├── tests/
+│   └── README.md
+│
+├── 03-memory-systems/            # 记忆系统 🚧
+│   ├── src/
+│   │   ├── short_term_memory.py  # 短期记忆 (对话上下文)
+│   │   ├── long_term_memory.py   # 长期记忆 (向量存储)
+│   │   ├── episodic_memory.py    # 情景记忆
+│   │   ├── semantic_memory.py    # 语义记忆
+│   │   └── memory_retrieval.py   # 记忆检索策略
+│   ├── notebooks/
+│   │   ├── 01_ShortTermMemory_tutorial.ipynb
+│   │   ├── 02_LongTermMemory_tutorial.ipynb
+│   │   └── 03_MemoryRetrieval_tutorial.ipynb
+│   ├── tests/
+│   └── README.md
+│
+├── 04-planning/                  # 任务规划 🚧
+│   ├── src/
+│   │   ├── task_decomposition.py # 任务分解
+│   │   ├── plan_generation.py    # 计划生成
+│   │   ├── plan_execution.py     # 计划执行
+│   │   └── plan_refinement.py    # 计划优化与重规划
+│   ├── notebooks/
+│   │   ├── 01_TaskDecomposition_tutorial.ipynb
+│   │   ├── 02_PlanGeneration_tutorial.ipynb
+│   │   └── 03_PlanExecution_tutorial.ipynb
+│   ├── tests/
+│   └── README.md
+│
+└── 05-multi-agent/               # 多智能体系统 🚧
+    ├── src/
+    │   ├── agent_base.py         # Agent 基类
+    │   ├── agent_communication.py # 智能体通信协议
+    │   ├── agent_orchestrator.py # 智能体编排器
+    │   ├── debate_agents.py      # 辩论式多智能体
+    │   └── collaborative_agents.py # 协作式多智能体
+    ├── notebooks/
+    │   ├── 01_AgentBase_tutorial.ipynb
+    │   ├── 02_MultiAgentDebate_tutorial.ipynb
+    │   └── 03_CollaborativeAgents_tutorial.ipynb
+    ├── tests/
+    └── README.md
+```
+
+### 完成状态
+
+| 子模块 | 核心内容 | 状态 |
+|:-------|:---------|:-----|
+| 01-tool-use | Function Calling、工具注册、结构化输出 | ✅ 已完成 (57 tests) |
+| 02-reasoning | CoT、ReAct、ToT、反思 | ✅ 已完成 (97 tests) |
+| 03-memory-systems | 短期/长期记忆、检索策略 | 🚧 待开发 |
+| 04-planning | 任务分解、计划生成与执行 | 🚧 待开发 |
+| 05-multi-agent | 多智能体通信与协作 | 🚧 待开发 |
+
+### 详细任务清单
+
+#### 01-tool-use (已完成 100%)
+
+**已完成:**
+- [x] Function Calling 实现 (src/function_calling.py)
+  - [x] OpenAI 风格函数定义 (FunctionDefinition)
+  - [x] 参数验证与类型检查 (FunctionParameter, ParameterType)
+  - [x] 函数调用解析 (FunctionCallParser)
+  - [x] 自动 Schema 生成 (create_function_schema)
+- [x] 工具注册与管理 (src/tool_registry.py)
+  - [x] 工具装饰器 (@registry.register, @tool)
+  - [x] 工具描述生成 (get_tool_descriptions)
+  - [x] 标签系统与过滤 (get_by_tag, list_tags)
+  - [x] 启用/禁用控制 (enable, disable)
+- [x] 工具执行引擎 (src/tool_executor.py)
+  - [x] 超时控制 (ThreadPoolExecutor)
+  - [x] 重试机制 (execute_with_retry)
+  - [x] 生命周期钩子 (before_execute, after_execute, on_error)
+  - [x] 执行历史与统计 (get_history, get_stats)
+- [x] 结构化输出 (src/structured_output.py)
+  - [x] JSON Schema 约束
+  - [x] Pydantic 模型集成
+  - [x] 输出验证与自动修复 (auto_fix)
+  - [x] 工厂函数 (create_choice_parser, create_extraction_parser)
+- [x] 知识点文档 (知识点.md - 2100+ 行)
+- [x] Jupyter 教程 (5个)
+  - [x] 01_FunctionCalling_tutorial.ipynb
+  - [x] 02_ToolRegistry_tutorial.ipynb
+  - [x] 03_StructuredOutput_tutorial.ipynb
+  - [x] 04_ToolExecutor_tutorial.ipynb
+  - [x] 05_Integration_tutorial.ipynb
+- [x] 单元测试 (57 tests)
+  - [x] test_tool_use.py (全覆盖)
+
+#### 02-reasoning (已完成 100%)
+
+**已完成:**
+- [x] 思维链 (Chain of Thought) - src/chain_of_thought.py
+  - [x] Zero-shot CoT (ZeroShotCoT)
+  - [x] Few-shot CoT (FewShotCoT)
+  - [x] Auto-CoT (AutoCoT)
+  - [x] CoT 提示构建器 (CoTPromptBuilder)
+  - [x] 单元测试 (16 tests)
+- [x] ReAct 框架 - src/react.py
+  - [x] 思考-行动-观察循环 (Thought, Action, Observation)
+  - [x] 工具集成 (SimpleTool, ReActAgent)
+  - [x] 提示构建与解析 (ReActPromptBuilder, ReActParser)
+  - [x] 单元测试 (22 tests)
+- [x] 思维树 (Tree of Thoughts) - src/tree_of_thoughts.py
+  - [x] 思维节点 (ThoughtNode, NodeStatus)
+  - [x] BFS/DFS/Beam 搜索策略
+  - [x] 思考生成与评估 (ThoughtGenerator, ThoughtEvaluator)
+  - [x] 单元测试 (24 tests)
+- [x] 自一致性 (Self-Consistency) - src/self_consistency.py
+  - [x] 多数投票 (MajorityVoting)
+  - [x] 加权投票 (WeightedVoting)
+  - [x] 单元测试 (16 tests)
+- [x] 反思机制 - src/reflection.py
+  - [x] 自我评估 (SelfEvaluator)
+  - [x] 错误检测 (ErrorDetector)
+  - [x] 纠正策略 (CorrectionStrategy)
+  - [x] 单元测试 (19 tests)
+- [x] 知识点文档 (知识点.md - 600+ 行)
+- [x] Jupyter 教程 (4个)
+  - [x] 01_ChainOfThought_tutorial.ipynb
+  - [x] 02_ReAct_tutorial.ipynb
+  - [x] 03_TreeOfThoughts_tutorial.ipynb
+  - [x] 04_Reflection_SelfConsistency_tutorial.ipynb
+- [x] 单元测试 (97 tests 全部通过)
+
+#### 03-memory-systems (待开发)
+
+- [ ] 短期记忆
+  - [ ] 滑动窗口上下文
+  - [ ] 摘要压缩
+  - [ ] 重要性评分
+  - [ ] 单元测试
+- [ ] 长期记忆
+  - [ ] 向量数据库集成 (FAISS/Chroma)
+  - [ ] 记忆编码与存储
+  - [ ] 相似度检索
+  - [ ] 单元测试
+- [ ] 记忆检索策略
+  - [ ] 时间衰减
+  - [ ] 相关性排序
+  - [ ] 混合检索
+  - [ ] 单元测试
+
+#### 04-planning (待开发)
+
+- [ ] 任务分解
+  - [ ] 层次化分解
+  - [ ] 依赖关系分析
+  - [ ] 子任务生成
+  - [ ] 单元测试
+- [ ] 计划生成
+  - [ ] 目标导向规划
+  - [ ] 约束满足
+  - [ ] 计划验证
+  - [ ] 单元测试
+- [ ] 计划执行与优化
+  - [ ] 执行监控
+  - [ ] 失败检测
+  - [ ] 动态重规划
+  - [ ] 单元测试
+
+#### 05-multi-agent (待开发)
+
+- [ ] Agent 基础架构
+  - [ ] Agent 基类设计
+  - [ ] 角色定义
+  - [ ] 状态管理
+  - [ ] 单元测试
+- [ ] 智能体通信
+  - [ ] 消息协议
+  - [ ] 广播与点对点
+  - [ ] 异步通信
+  - [ ] 单元测试
+- [ ] 多智能体协作
+  - [ ] 辩论式推理
+  - [ ] 分工协作
+  - [ ] 共识达成
+  - [ ] 单元测试
+
+### 新增依赖
+
+```toml
+# pyproject.toml 新增
+instructor = "^1.0"        # 结构化输出
+tenacity = "^8.0"          # 重试机制
+networkx = "^3.0"          # 图结构 (ToT/规划)
+```
+
+---
+
+## 二、已完成模块：11-multimodal-learning
 
 ### 模块结构
 
@@ -185,7 +408,8 @@
 | Phase 3 | 强化学习 + LLM (07, 10) | ✅ 完成 |
 | Phase 4 | 多模态学习 (11) | ✅ 完成 |
 | Phase 5 | 高级应用与部署 (12) | ✅ 完成 |
-| **Phase 6** | **分布式训练与扩展 (13)** | **✅ 完成** |
+| Phase 6 | 分布式训练与扩展 (13) | ✅ 完成 |
+| **Phase 7** | **AI Agents 与推理系统 (14)** | **🚧 进行中** |
 
 ---
 
