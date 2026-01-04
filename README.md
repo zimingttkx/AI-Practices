@@ -29,7 +29,7 @@
 
 <div align="center">
 
-| **350+ Notebooks** | **13大核心模块** | **1100+ 单元测试** | **生产级代码** | **2枚Kaggle金牌** |
+| **400+ Notebooks** | **14大核心模块** | **1200+ 单元测试** | **生产级代码** | **2枚Kaggle金牌** |
 |:------------------:|:----------------:|:-----------------:|:-------------:|:----------------:|
 | 可复现实验 | 系统化学习路径 | 质量保证 | 工程实践 | 竞赛验证 |
 
@@ -73,6 +73,7 @@
 | V | **11-多模态学习** | CLIP、Stable Diffusion、Whisper、TTS | 47+ |
 | V | **12-部署优化** | 量化剪枝、TensorRT、FastAPI、MLOps | 50+ |
 | VI | **13-分布式训练** | DDP、FSDP、ZeRO、张量/流水线并行、混合精度 | 42+ |
+| VII | **14-智能体推理** | 工具调用、思维链、ReAct、思维树、多智能体 | 30+ |
 
 <details>
 <summary><b>📂 展开完整目录结构</b></summary>
@@ -137,6 +138,13 @@ AI-Practices/
     ├── 02-model-parallel/          # 张量并行、流水线并行
     ├── 03-mixed-precision/         # AMP、BF16、梯度缩放
     └── 04-large-scale-training/    # DeepSpeed、Megatron
+
+└── 14-agents-reasoning/            # 智能体与推理
+    ├── 01-tool-use/                # 工具调用、Function Calling
+    ├── 02-reasoning/               # CoT、ReAct、ToT、反思
+    ├── 03-memory-systems/          # 短期/长期记忆
+    ├── 04-planning/                # 任务分解与规划
+    └── 05-multi-agent/             # 多智能体协作
 ```
 
 </details>
@@ -252,6 +260,16 @@ $$Q^*(s, a) = \mathbb{E}\left[r + \gamma \max_{a'} Q^*(s', a') \mid s, a\right]$
 | **模型并行** | 张量并行、流水线并行、序列并行 | 大模型切分 |
 | **混合精度** | AMP、BF16、梯度缩放 | 加速训练、节省显存 |
 | **大规模训练** | DeepSpeed、Megatron-LM | 百亿参数训练 |
+
+### 智能体与推理
+
+| 领域 | 技术 | 说明 |
+|:-----|:-----|:-----|
+| **工具调用** | Function Calling、工具注册、结构化输出 | LLM工具集成 |
+| **推理策略** | CoT、ReAct、ToT、自一致性 | 增强推理能力 |
+| **记忆系统** | 短期记忆、长期记忆、向量检索 | 上下文管理 |
+| **任务规划** | 任务分解、计划生成、动态重规划 | 复杂任务处理 |
+| **多智能体** | 辩论式推理、协作式推理、共识达成 | 多Agent协作 |
 
 ---
 

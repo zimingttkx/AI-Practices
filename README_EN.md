@@ -29,7 +29,7 @@
 
 <div align="center">
 
-| **350+ Notebooks** | **13 Core Modules** | **1100+ Unit Tests** | **Production-Ready** | **2 Kaggle Golds** |
+| **400+ Notebooks** | **14 Core Modules** | **1200+ Unit Tests** | **Production-Ready** | **2 Kaggle Golds** |
 |:------------------:|:-------------------:|:--------------------:|:--------------------:|:------------------:|
 | Reproducible Experiments | Systematic Learning Path | Quality Assurance | Engineering Practice | Competition Verified |
 
@@ -73,6 +73,7 @@
 | V | **11-Multimodal Learning** | CLIP, Stable Diffusion, Whisper, TTS | 47+ |
 | V | **12-Deployment Optimization** | Quantization, TensorRT, FastAPI, MLOps | 50+ |
 | VI | **13-Distributed Training** | DDP, FSDP, ZeRO, Tensor/Pipeline Parallel, Mixed Precision | 42+ |
+| VII | **14-Agents & Reasoning** | Tool Use, CoT, ReAct, ToT, Multi-Agent | 30+ |
 
 <details>
 <summary><b>📂 Expand Full Directory Structure</b></summary>
@@ -137,6 +138,13 @@ AI-Practices/
     ├── 02-model-parallel/          # Tensor Parallel, Pipeline Parallel
     ├── 03-mixed-precision/         # AMP, BF16, Gradient Scaling
     └── 04-large-scale-training/    # DeepSpeed, Megatron
+
+└── 14-agents-reasoning/            # Agents & Reasoning
+    ├── 01-tool-use/                # Tool Calling, Function Calling
+    ├── 02-reasoning/               # CoT, ReAct, ToT, Reflection
+    ├── 03-memory-systems/          # Short/Long-term Memory
+    ├── 04-planning/                # Task Decomposition & Planning
+    └── 05-multi-agent/             # Multi-Agent Collaboration
 ```
 
 </details>
@@ -252,6 +260,16 @@ $$Q^*(s, a) = \mathbb{E}\left[r + \gamma \max_{a'} Q^*(s', a') \mid s, a\right]$
 | **Model Parallel** | Tensor Parallel, Pipeline Parallel, Sequence Parallel | Large Model Partitioning |
 | **Mixed Precision** | AMP, BF16, Gradient Scaling | Faster Training, Memory Saving |
 | **Large-Scale Training** | DeepSpeed, Megatron-LM | Billion-Parameter Training |
+
+### Agents & Reasoning
+
+| Domain | Techniques | Description |
+|:-------|:-----------|:------------|
+| **Tool Use** | Function Calling, Tool Registry, Structured Output | LLM Tool Integration |
+| **Reasoning** | CoT, ReAct, ToT, Self-Consistency | Enhanced Reasoning |
+| **Memory Systems** | Short-term, Long-term, Vector Retrieval | Context Management |
+| **Planning** | Task Decomposition, Plan Generation, Re-planning | Complex Task Handling |
+| **Multi-Agent** | Debate, Collaboration, Consensus | Multi-Agent Cooperation |
 
 ---
 
