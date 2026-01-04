@@ -2,7 +2,32 @@
 
 本文档定义了 AI-Practices 项目的代码风格、文件命名和目录结构规范。
 
-> **最后更新**: 2026-01-03
+> **最后更新**: 2026-01-04
+
+---
+
+## 项目概览
+
+AI-Practices 是一个系统化的人工智能学习与研究平台，包含 14 个核心模块，覆盖从机器学习基础到智能体推理的完整技术栈。
+
+### 模块列表
+
+| 编号 | 模块 | 内容 |
+|:----:|:-----|:-----|
+| 01 | foundations | 机器学习基础 |
+| 02 | neural-networks | 神经网络 |
+| 03 | computer-vision | 计算机视觉 |
+| 04 | sequence-models | 序列模型 |
+| 05 | advanced-topics | 高级专题 |
+| 06 | generative-models | 生成模型 |
+| 07 | reinforcement-learning | 强化学习 |
+| 08 | theory-notes | 理论笔记 |
+| 09 | practical-projects | 实战项目 |
+| 10 | large-language-models | 大语言模型 |
+| 11 | multimodal-learning | 多模态学习 |
+| 12 | deployment-optimization | 部署优化 |
+| 13 | distributed-training | 分布式训练 |
+| 14 | agents-reasoning | 智能体推理 |
 
 ---
 
