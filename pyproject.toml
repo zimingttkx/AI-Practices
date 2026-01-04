@@ -92,6 +92,7 @@ testpaths = [
     "11-multimodal-learning",
     "12-deployment-optimization",
     "13-distributed-training",
+    "14-agents-reasoning",
 ]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
@@ -110,6 +111,7 @@ addopts = [
     "--ignore=09-practical-projects/04-time-series/02-stock-prediction-lstm/test_all.py",
     "--ignore=09-practical-projects/05-kaggle-competitions/02-Feedback-ELL-1st-Place",
     "--ignore=09-practical-projects/06-reinforcement-learning",
+    "--ignore=14-agents-reasoning/02-reasoning/tests",
 ]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
