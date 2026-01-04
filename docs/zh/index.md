@@ -21,11 +21,11 @@ hero:
 
 features:
   - icon: 📊
-    title: 113+ 可复现实验
+    title: 400+ 可复现实验
     details: 每个算法都有完整的 Jupyter Notebook 实现，含详细注释、数学推导与可视化分析
   - icon: 🧠
-    title: 9 大核心模块
-    details: 渐进式课程设计，从机器学习基础到强化学习，覆盖 AI 全技术栈
+    title: 14 大核心模块
+    details: 渐进式课程设计，从机器学习基础到智能体推理，覆盖 AI 全技术栈
   - icon: 🏆
     title: Kaggle 金牌方案
     details: 包含 Feedback Prize、RSNA 等顶级竞赛的完整解决方案
@@ -34,7 +34,7 @@ features:
     details: 数学推导 → NumPy 实现 → 框架应用 → 实战项目
   - icon: ⚡
     title: 生产级代码质量
-    details: 149k+ 行高质量代码，遵循 PEP8 规范，完整类型注解
+    details: 180k+ 行高质量代码，遵循 PEP8 规范，完整类型注解
   - icon: 🌐
     title: 中英双语文档
     details: 完整的双语文档支持，方便国内外开发者学习交流

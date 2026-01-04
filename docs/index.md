@@ -23,10 +23,10 @@ hero:
 
 features:
   - icon: 📚
-    title: 9 大核心模块
-    details: 从机器学习基础到强化学习，覆盖 AI 全技术栈
+    title: 14 大核心模块
+    details: 从机器学习基础到智能体推理，覆盖 AI 全技术栈
   - icon: 🧪
-    title: 113+ 可复现实验
+    title: 400+ 可复现实验
     details: 每个算法都有完整的 Jupyter Notebook 实现
   - icon: 🏆
     title: Kaggle 金牌方案

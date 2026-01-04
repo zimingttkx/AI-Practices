@@ -66,7 +66,12 @@ export default defineConfig({
               { text: '06 - 生成模型', link: '/zh/modules/06-generative' },
               { text: '07 - 强化学习', link: '/zh/modules/07-reinforcement-learning' },
               { text: '08 - 理论笔记', link: '/zh/modules/08-theory' },
-              { text: '09 - 实战项目', link: '/zh/modules/09-projects' }
+              { text: '09 - 实战项目', link: '/zh/modules/09-projects' },
+              { text: '10 - 大语言模型', link: '/zh/modules/10-llm' },
+              { text: '11 - 多模态学习', link: '/zh/modules/11-multimodal' },
+              { text: '12 - 部署优化', link: '/zh/modules/12-deployment' },
+              { text: '13 - 分布式训练', link: '/zh/modules/13-distributed' },
+              { text: '14 - 智能体推理', link: '/zh/modules/14-agents' }
             ]
           },
           { text: 'GitHub', link: 'https://github.com/zimingttkx/AI-Practices' }
@@ -116,6 +121,17 @@ export default defineConfig({
               items: [
                 { text: '08 - 理论笔记', link: '/zh/modules/08-theory' },
                 { text: '09 - 实战项目', link: '/zh/modules/09-projects' }
+              ]
+            },
+            {
+              text: '前沿技术',
+              collapsed: false,
+              items: [
+                { text: '10 - 大语言模型', link: '/zh/modules/10-llm' },
+                { text: '11 - 多模态学习', link: '/zh/modules/11-multimodal' },
+                { text: '12 - 部署优化', link: '/zh/modules/12-deployment' },
+                { text: '13 - 分布式训练', link: '/zh/modules/13-distributed' },
+                { text: '14 - 智能体推理', link: '/zh/modules/14-agents' }
               ]
             }
           ]
@@ -169,7 +185,12 @@ export default defineConfig({
               { text: '06 - Generative Models', link: '/en/modules/06-generative' },
               { text: '07 - Reinforcement Learning', link: '/en/modules/07-reinforcement-learning' },
               { text: '08 - Theory Notes', link: '/en/modules/08-theory' },
-              { text: '09 - Projects', link: '/en/modules/09-projects' }
+              { text: '09 - Projects', link: '/en/modules/09-projects' },
+              { text: '10 - Large Language Models', link: '/en/modules/10-llm' },
+              { text: '11 - Multimodal Learning', link: '/en/modules/11-multimodal' },
+              { text: '12 - Deployment', link: '/en/modules/12-deployment' },
+              { text: '13 - Distributed Training', link: '/en/modules/13-distributed' },
+              { text: '14 - Agents & Reasoning', link: '/en/modules/14-agents' }
             ]
           },
           { text: 'GitHub', link: 'https://github.com/zimingttkx/AI-Practices' }
@@ -219,6 +240,17 @@ export default defineConfig({
               items: [
                 { text: '08 - Theory Notes', link: '/en/modules/08-theory' },
                 { text: '09 - Projects', link: '/en/modules/09-projects' }
+              ]
+            },
+            {
+              text: 'Frontier Tech',
+              collapsed: false,
+              items: [
+                { text: '10 - Large Language Models', link: '/en/modules/10-llm' },
+                { text: '11 - Multimodal Learning', link: '/en/modules/11-multimodal' },
+                { text: '12 - Deployment', link: '/en/modules/12-deployment' },
+                { text: '13 - Distributed Training', link: '/en/modules/13-distributed' },
+                { text: '14 - Agents & Reasoning', link: '/en/modules/14-agents' }
               ]
             }
           ]
