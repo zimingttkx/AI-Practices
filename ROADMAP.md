@@ -1,6 +1,6 @@
 # AI-Practices 项目路线图
 
-> **最后更新**: 2026-01-04 | **当前阶段**: Phase 7 - AI Agents 与推理系统 (进行中)
+> **最后更新**: 2026-01-06 | **当前阶段**: Phase 7 - AI Agents 与推理系统 (进行中)
 
 ---
 
@@ -21,7 +21,7 @@
 | 11-multimodal-learning | 完成 | 100% |
 | 12-deployment-optimization | 完成 | 100% |
 | 13-distributed-training | 完成 | 100% |
-| **14-agents-reasoning** | **进行中** | **50%** |
+| **14-agents-reasoning** | **进行中** | **80%** |
 
 ---
 
@@ -107,7 +107,7 @@
 |:-------|:---------|:-----|
 | 01-tool-use | Function Calling、工具注册、结构化输出 | ✅ 已完成 (57 tests) |
 | 02-reasoning | CoT、ReAct、ToT、反思 | ✅ 已完成 (97 tests) |
-| 03-memory-systems | 短期/长期记忆、检索策略 | 🚧 待开发 |
+| 03-memory-systems | 短期/长期记忆、检索策略 | ✅ 已完成 (52 tests) |
 | 04-planning | 任务分解、计划生成与执行 | 🚧 待开发 |
 | 05-multi-agent | 多智能体通信与协作 | 🚧 待开发 |
 
@@ -182,23 +182,49 @@
   - [x] 04_Reflection_SelfConsistency_tutorial.ipynb
 - [x] 单元测试 (97 tests 全部通过)
 
-#### 03-memory-systems (待开发)
+#### 03-memory-systems (已完成 100%)
 
-- [ ] 短期记忆
-  - [ ] 滑动窗口上下文
-  - [ ] 摘要压缩
-  - [ ] 重要性评分
-  - [ ] 单元测试
-- [ ] 长期记忆
-  - [ ] 向量数据库集成 (FAISS/Chroma)
-  - [ ] 记忆编码与存储
-  - [ ] 相似度检索
-  - [ ] 单元测试
-- [ ] 记忆检索策略
-  - [ ] 时间衰减
-  - [ ] 相关性排序
-  - [ ] 混合检索
-  - [ ] 单元测试
+**已完成:**
+- [x] 短期记忆 (src/short_term_memory.py)
+  - [x] Message 数据结构与 MessageRole 枚举
+  - [x] ConversationBuffer - 完整缓存策略
+  - [x] SlidingWindowMemory - 滑动窗口策略
+  - [x] SummaryMemory - 摘要压缩策略
+  - [x] TokenBasedMemory - Token 预算管理
+  - [x] 工厂函数 create_conversation_memory
+  - [x] 单元测试 (22 tests)
+- [x] 长期记忆 (src/long_term_memory.py)
+  - [x] MemoryEntry 数据结构与 MemoryType 枚举
+  - [x] SimpleEmbedding 向量嵌入
+  - [x] InMemoryVectorStore 向量存储
+  - [x] LongTermMemory 主接口 (store/recall/forget)
+  - [x] 持久化 (save/load JSON)
+  - [x] 单元测试 (18 tests)
+- [x] 记忆检索策略 (src/memory_retrieval.py)
+  - [x] TimeDecay 时间衰减函数
+  - [x] SimilarityRetrieval - 相似度检索
+  - [x] RecencyRetrieval - 时效性检索
+  - [x] ImportanceRetrieval - 重要性检索
+  - [x] HybridRetrieval - 混合检索 (α·sim + β·rec + γ·imp)
+  - [x] MemoryRetriever 高级接口
+  - [x] 单元测试 (12 tests)
+- [x] 知识点文档 (知识点.md - 3164 行)
+  - [x] 概述与动机: AI Agent 记忆系统的必要性
+  - [x] 认知科学基础: Atkinson-Shiffrin 模型、记忆类型映射
+  - [x] 短期记忆系统: 4种策略 (Buffer/Sliding/Summary/Token)
+  - [x] 长期记忆系统: 记忆类型、向量嵌入、存储实现
+  - [x] 记忆检索策略: 综合评分、MMR、上下文感知检索
+  - [x] 数学基础与算法: 向量空间、ANN (KD-Tree/HNSW/IVF)、优化算法
+  - [x] 工程实现细节: 系统架构、数据持久化、并发控制、错误处理
+  - [x] 性能优化与扩展: 缓存策略、批处理、分布式扩展
+  - [x] 实际应用案例: 智能客服、学习助手、代码助手
+  - [x] 前沿研究与未来方向: 神经符号记忆、联邦学习、多模态记忆
+  - [x] 参考文献: 学术论文、技术文档、书籍、在线资源
+- [x] Jupyter 教程 (3个)
+  - [x] 01_ShortTermMemory_tutorial.ipynb
+  - [x] 02_LongTermMemory_tutorial.ipynb
+  - [x] 03_MemoryRetrieval_tutorial.ipynb
+- [x] 单元测试 (52 tests 全部通过)
 
 #### 04-planning (待开发)
 
