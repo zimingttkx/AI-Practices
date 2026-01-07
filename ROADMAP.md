@@ -1,6 +1,6 @@
 # AI-Practices 项目路线图
 
-> **最后更新**: 2026-01-06 | **当前阶段**: Phase 7 - AI Agents 与推理系统 (进行中)
+> **最后更新**: 2026-01-07 | **当前阶段**: Phase 7 - AI Agents 与推理系统 (进行中)
 
 ---
 
@@ -21,7 +21,7 @@
 | 11-multimodal-learning | 完成 | 100% |
 | 12-deployment-optimization | 完成 | 100% |
 | 13-distributed-training | 完成 | 100% |
-| **14-agents-reasoning** | **进行中** | **80%** |
+| **14-agents-reasoning** | **进行中** | **100%** |
 
 ---
 
@@ -226,23 +226,46 @@
   - [x] 03_MemoryRetrieval_tutorial.ipynb
 - [x] 单元测试 (52 tests 全部通过)
 
-#### 04-planning (待开发)
+#### 04-planning
 
-- [ ] 任务分解
-  - [ ] 层次化分解
-  - [ ] 依赖关系分析
-  - [ ] 子任务生成
-  - [ ] 单元测试
-- [ ] 计划生成
-  - [ ] 目标导向规划
-  - [ ] 约束满足
-  - [ ] 计划验证
-  - [ ] 单元测试
-- [ ] 计划执行与优化
-  - [ ] 执行监控
-  - [ ] 失败检测
-  - [ ] 动态重规划
-  - [ ] 单元测试
+- [x] 任务分解 (src/task_decomposition.py - 900行)
+  - [x] Task 数据结构: 状态机、依赖管理、树形结构
+  - [x] HierarchicalDecomposer: 层次化分解 O(b^d)
+  - [x] SequentialDecomposer: 顺序分解与依赖链
+  - [x] DependencyAnalyzer: 拓扑排序 Kahn、DFS 环检测
+  - [x] TaskDecomposer: 统一接口与验证
+  - [x] 单元测试 (50 tests)
+- [x] 计划生成 (src/plan_generation.py - 1000行)
+  - [x] Plan 数据结构: DAG、进度跟踪、约束管理
+  - [x] ForwardPlanner: 前向规划 S0 → Goal
+  - [x] BackwardPlanner: 后向规划 Goal → S0
+  - [x] HierarchicalPlanner: HTN 层次规划
+  - [x] PlanValidator: 有效性验证、约束检查
+  - [x] 单元测试 (40 tests)
+- [x] 计划执行 (src/plan_execution.py - 500行)
+  - [x] PlanExecutor: 串行/并行执行、阿姆达尔定律
+  - [x] ExecutionPolicy: 重试策略 (指数退避)、超时控制
+  - [x] ExecutionMonitor: 统计、成功率、性能指标
+  - [x] ExecutionContext: 共享状态、结果传递
+  - [x] 单元测试 (30 tests)
+- [x] 计划优化 (src/plan_refinement.py - 400行)
+  - [x] FailureRecovery: 分级恢复 (retry/skip/replace/abort)
+  - [x] PlanOptimizer: 去重、并行化识别、优先级排序
+  - [x] AdaptiveReplanner: 动态重规划、稳定性优化
+  - [x] PlanRefinement: 统一优化接口
+  - [x] 单元测试 (20 tests)
+- [x] 知识点文档 (知识点.md - 扩展版)
+  - [x] 数学基础: 规划问题形式化 P = ⟨S,A,T,s0,G,C⟩
+  - [x] 算法详解: Kahn 拓扑排序 O(V+E)、DFS 环检测
+  - [x] HTN 规划: 复杂度优化 O(Σb_i^d_i) << O(b^d)
+  - [x] 状态机: FSM、转移函数、终止状态
+  - [x] 重规划: min J(π) = C(π) + λ·D(π,π_old)
+- [x] Jupyter 教程 (3个)
+  - [x] 01_TaskDecomposition_tutorial.ipynb (7 代码单元格)
+  - [x] 02_PlanGeneration_tutorial.ipynb (19 代码单元格)
+  - [x] 03_PlanExecution_tutorial.ipynb (19 代码单元格)
+- [x] 单元测试 (170 tests 全部通过)
+- [x] 研究级重构: 完整数学公式、算法复杂度、设计模式
 
 #### 05-multi-agent (待开发)
 
