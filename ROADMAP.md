@@ -1,6 +1,6 @@
 # AI-Practices 项目路线图
 
-> **最后更新**: 2026-01-08 | **当前阶段**: Phase 7 - AI Agents 与推理系统 (已完成)
+> **最后更新**: 2026-01-09 | **当前阶段**: Phase 7 - AI Agents 与推理系统 (已完成)
 
 ---
 
@@ -86,17 +86,31 @@
 │   ├── tests/
 │   └── README.md
 │
-└── 05-multi-agent/               # 多智能体系统 ✅ (81 tests)
+├── 05-multi-agent/               # 多智能体系统 ✅ (81 tests)
+│   ├── src/
+│   │   ├── agent_base.py         # Agent 基类
+│   │   ├── agent_communication.py # 智能体通信协议
+│   │   ├── agent_orchestrator.py # 智能体编排器
+│   │   ├── debate_agents.py      # 辩论式多智能体
+│   │   └── collaborative_agents.py # 协作式多智能体
+│   ├── notebooks/
+│   │   ├── 01_AgentBase_tutorial.ipynb
+│   │   ├── 02_MultiAgentDebate_tutorial.ipynb
+│   │   └── 03_CollaborativeAgents_tutorial.ipynb
+│   ├── tests/
+│   └── README.md
+│
+└── 06-autonomous-agent/          # 自主智能体 ✅ (60 tests)
     ├── src/
-    │   ├── agent_base.py         # Agent 基类
-    │   ├── agent_communication.py # 智能体通信协议
-    │   ├── agent_orchestrator.py # 智能体编排器
-    │   ├── debate_agents.py      # 辩论式多智能体
-    │   └── collaborative_agents.py # 协作式多智能体
+    │   ├── goal_manager.py       # 目标管理 (HTN分解、优先级队列)
+    │   ├── action_executor.py    # 动作执行 (工具/代码/文件)
+    │   ├── self_reflection.py    # 自我反思 (UCB1策略调整)
+    │   ├── agent_loop.py         # OODA执行循环
+    │   └── autonomous_agent.py   # 主类集成
     ├── notebooks/
-    │   ├── 01_AgentBase_tutorial.ipynb
-    │   ├── 02_MultiAgentDebate_tutorial.ipynb
-    │   └── 03_CollaborativeAgents_tutorial.ipynb
+    │   ├── 01_GoalManagement_tutorial.ipynb
+    │   ├── 02_ActionExecution_tutorial.ipynb
+    │   └── 03_AutonomousAgent_tutorial.ipynb
     ├── tests/
     └── README.md
 ```
@@ -110,6 +124,7 @@
 | 03-memory-systems | 短期/长期记忆、检索策略 | ✅ 已完成 (52 tests) |
 | 04-planning | 任务分解、计划生成与执行 | ✅ 已完成 (170 tests) |
 | 05-multi-agent | 多智能体通信与协作 | ✅ 已完成 (81 tests) |
+| 06-autonomous-agent | AutoGPT风格自主智能体 | ✅ 已完成 (60 tests) |
 
 ### 详细任务清单
 
