@@ -67,13 +67,13 @@
 | III | **05-高级专题** | 分布式训练、模型压缩、部署优化 | 30+ |
 | III | **06-生成模型** | VAE、GAN、Diffusion Models | 35+ |
 | III | **07-强化学习** | DQN、PPO、SAC、Actor-Critic | 80+ |
-| IV | **09-实战项目** | Kaggle竞赛、游戏AI、股票交易 | 100+ |
+| IV | **09-实战项目** | Kaggle竞赛、游戏AI、股票交易、跨模块集成 | 120+ |
 | - | **08-理论笔记** | 激活函数、损失函数、架构选型速查 | 16+ |
 | V | **10-大语言模型** | Transformer、GPT/LLaMA、LoRA微调、RAG、Agent | 60+ |
 | V | **11-多模态学习** | CLIP、Stable Diffusion、Whisper、TTS | 47+ |
 | V | **12-部署优化** | 量化剪枝、TensorRT、FastAPI、MLOps | 50+ |
 | VI | **13-分布式训练** | DDP、FSDP、ZeRO、张量/流水线并行、混合精度 | 42+ |
-| VII | **14-智能体推理** | 工具调用、思维链、ReAct、思维树、多智能体 | 30+ |
+| VII | **14-智能体推理** | 工具调用、思维链、ReAct、思维树、多智能体、自主智能体 | 45+ |
 
 <details>
 <summary><b>📂 展开完整目录结构</b></summary>
@@ -111,7 +111,8 @@ AI-Practices/
 │   ├── 03-nlp/                     # 情感分析、NER
 │   ├── 04-time-series/             # 温度预测
 │   ├── 05-kaggle-competitions/     # 金牌方案
-│   └── 06-reinforcement-learning/  # 游戏AI、股票交易
+│   ├── 06-reinforcement-learning/  # 游戏AI、股票交易
+│   └── 07-integrated-systems/      # 跨模块集成系统
 │
 ├── 10-large-language-models/       # 大语言模型
 │   ├── 01-llm-fundamentals/        # Transformer架构
@@ -144,7 +145,8 @@ AI-Practices/
     ├── 02-reasoning/               # CoT、ReAct、ToT、反思
     ├── 03-memory-systems/          # 短期/长期记忆
     ├── 04-planning/                # 任务分解与规划
-    └── 05-multi-agent/             # 多智能体协作
+    ├── 05-multi-agent/             # 多智能体协作
+    └── 06-autonomous-agent/        # 自主智能体
 ```
 
 </details>
