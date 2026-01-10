@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-04T09:08:52.846507",
+  "timestamp": "2026-01-10T11:13:38.770852",
   "modules": {
     "01-foundations": {
       "notebooks": 42,
@@ -50,16 +50,16 @@
       "lines_of_code": 0
     },
     "09-practical-projects": {
-      "notebooks": 66,
-      "python_files": 246,
-      "markdown_files": 45,
-      "lines_of_code": 71801
+      "notebooks": 71,
+      "python_files": 259,
+      "markdown_files": 48,
+      "lines_of_code": 75643
     }
   },
   "totals": {
-    "notebooks": 228,
-    "python_files": 421,
-    "markdown_files": 113,
-    "lines_of_code": 138432
+    "notebooks": 233,
+    "python_files": 434,
+    "markdown_files": 116,
+    "lines_of_code": 142274
   }
 }
