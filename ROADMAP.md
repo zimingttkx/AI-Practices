@@ -1,6 +1,6 @@
 # AI-Practices 项目路线图
 
-> **最后更新**: 2026-01-09 | **当前阶段**: Phase 7 - AI Agents 与推理系统 (已完成)
+> **最后更新**: 2026-01-10 | **当前阶段**: Phase 8 - 跨模块集成系统 (已完成)
 
 ---
 
@@ -21,11 +21,52 @@
 | 11-multimodal-learning | 完成 | 100% |
 | 12-deployment-optimization | 完成 | 100% |
 | 13-distributed-training | 完成 | 100% |
-| **14-agents-reasoning** | **完成** | **100%** |
+| 14-agents-reasoning | 完成 | 100% |
+| **09-practical-projects/07-integrated-systems** | **完成** | **100%** |
 
 ---
 
-## 一、当前模块：14-agents-reasoning (Phase 7)
+## 零、最新模块：07-integrated-systems (Phase 8)
+
+### 模块结构
+
+```
+09-practical-projects/07-integrated-systems/
+├── src/                          # 源代码
+│   ├── multimodal_retriever.py   # 多模态检索器
+│   ├── vision_qa_agent.py        # 视觉问答智能体
+│   ├── pipeline.py               # 端到端流水线
+│   ├── code_retriever.py         # 代码检索器
+│   ├── code_agent.py             # 代码生成智能体
+│   ├── review_agent.py           # 代码审查智能体
+│   ├── rag_benchmark.py          # RAG性能测试
+│   ├── agent_benchmark.py        # Agent性能测试
+│   └── multimodal_benchmark.py   # 多模态性能测试
+├── tests/                        # 单元测试 (109 tests)
+├── notebooks/                    # Jupyter教程
+│   ├── 01_MultimodalRetrieval_tutorial.ipynb
+│   ├── 02_VisionQA_tutorial.ipynb
+│   ├── 03_CodeAssistant_tutorial.ipynb
+│   ├── 04_Benchmarks_tutorial.ipynb
+│   └── 05_EndToEnd_tutorial.ipynb
+├── 知识点.md                      # 技术知识文档
+├── 使用教程.md                    # 使用指南
+└── README.md
+```
+
+### 完成状态
+
+| 功能模块 | 核心内容 | 测试数 |
+|:---------|:---------|:-------|
+| 多模态检索 | CLIP编码 + 向量检索 | 46 |
+| 代码助手 | 代码检索 + 生成 + 审查 | 41 |
+| 性能测试 | 延迟/吞吐量/准确率 | 22 |
+
+**总计**: 109 tests
+
+---
+
+## 一、14-agents-reasoning (Phase 7)
 
 ### 模块结构
 
