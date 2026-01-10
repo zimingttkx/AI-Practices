@@ -28,10 +28,14 @@
 │   ├── 02-Feedback-ELL-1st-Place/
 │   ├── 03-RSNA-2023-1st-Place/
 │   └── 04-RSNA-2024-Lumbar-Spine/
-└── 06-reinforcement-learning/ # 强化学习
-    ├── 01-flappy-bird-dqn/            # Flappy Bird DQN
-    ├── 02-dino-run-dqn/               # Chrome Dino DQN
-    └── 03-stock-trading-rl/           # 股票交易RL
+├── 06-reinforcement-learning/ # 强化学习
+│   ├── 01-flappy-bird-dqn/            # Flappy Bird DQN
+│   ├── 02-dino-run-dqn/               # Chrome Dino DQN
+│   └── 03-stock-trading-rl/           # 股票交易RL
+└── 07-integrated-systems/     # 跨模块集成 (109 tests)
+    ├── 01-multimodal-rag-agent/       # 多模态RAG智能体
+    ├── 02-code-assistant-agent/       # 代码助手智能体
+    └── 03-benchmarks/                 # 性能基准测试
 ```
 
 ---
