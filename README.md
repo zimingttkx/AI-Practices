@@ -1,8 +1,8 @@
 <div align="center">
 
-# AI-Practices
+# 🚀 AI-Practices
 
-### 系统化人工智能学习与研究平台
+### 系统化人工智能学习与实践平台
 
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org)
@@ -11,267 +11,272 @@
 
 [![Stars](https://img.shields.io/github/stars/zimingttkx/AI-Practices?style=for-the-badge&logo=github&color=yellow)](https://github.com/zimingttkx/AI-Practices/stargazers)
 [![Forks](https://img.shields.io/github/forks/zimingttkx/AI-Practices?style=for-the-badge&logo=github&color=blue)](https://github.com/zimingttkx/AI-Practices/network/members)
-[![Issues](https://img.shields.io/github/issues/zimingttkx/AI-Practices?style=for-the-badge&logo=github&color=red)](https://github.com/zimingttkx/AI-Practices/issues)
 
-**[English](./README_EN.md)** | **[在线文档](https://zimingttkx.github.io/AI-Practices/)** | **[快速开始](#-快速开始)**
+**[English](./README_EN.md)** | **[快速开始](#-快速开始)** | **[项目路线图](./ROADMAP.md)**
 
 ---
 
-**从理论到实战，构建完整的AI知识体系**
-
-*Machine Learning • Deep Learning • Computer Vision • NLP • LLM • Multimodal • Reinforcement Learning*
+*从数学原理到工程实践，构建完整的AI知识体系*
 
 </div>
 
 ---
 
-## 项目亮点
+## 项目概览
 
 <div align="center">
 
-| **400+ Notebooks** | **14大核心模块** | **1200+ 单元测试** | **生产级代码** | **2枚Kaggle金牌** |
-|:------------------:|:----------------:|:-----------------:|:-------------:|:----------------:|
-| 可复现实验 | 系统化学习路径 | 质量保证 | 工程实践 | 竞赛验证 |
+| **500+ Python文件** | **280+ Notebooks** | **14大核心模块** | **100+ 单元测试** | **2枚Kaggle金牌** |
+|:------------------:|:------------------:|:----------------:|:----------------:|:----------------:|
+| 生产级代码实现 | 可交互式学习 | 系统化知识体系 | 代码质量保证 | 竞赛实战验证 |
 
 </div>
 
-### 为什么选择 AI-Practices？
+### 核心特点
 
-- **渐进式学习** — 从数学推导到框架工程，循序渐进
-- **理论+实践** — 不仅知道"怎么做"，更理解"为什么"
-- **工程导向** — 从学术研究到工业部署的完整链路
-- **竞赛验证** — Kaggle Top 1% 金牌方案，实战检验
-
----
-
-## 学习路径
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│  Phase I        │    │  Phase II       │    │  Phase III      │    │  Phase IV       │
-│  理论先行       │ -> │  从零实现       │ -> │  框架工程       │ -> │  实战项目       │
-│  数学推导与分析 │    │  NumPy手写实现  │    │  PyTorch/TF     │    │  Kaggle竞赛     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+- **系统化学习路径** — 从基础数学到前沿技术，14个模块循序渐进
+- **理论与实践结合** — 每个概念都有数学推导和代码实现
+- **工程化标准** — 遵循工业级代码规范，包含完整测试
+- **竞赛级方案** — 包含Kaggle Top 1%金牌解决方案
 
 ---
 
-## 模块总览
-
-| 阶段 | 模块 | 内容 | 文件数 |
-|:----:|:-----|:-----|:------:|
-| I | **01-机器学习基础** | 线性模型、SVM、决策树、集成学习、降维、聚类 | 75+ |
-| II | **02-神经网络** | 反向传播、优化器、正则化、BatchNorm | 42+ |
-| II | **03-计算机视觉** | CNN架构演进、迁移学习、目标检测 | 50+ |
-| II | **04-序列模型** | RNN/LSTM、Attention、Transformer | 40+ |
-| III | **05-高级专题** | 分布式训练、模型压缩、部署优化 | 30+ |
-| III | **06-生成模型** | VAE、GAN、Diffusion Models | 35+ |
-| III | **07-强化学习** | DQN、PPO、SAC、Actor-Critic | 80+ |
-| IV | **09-实战项目** | Kaggle竞赛、游戏AI、股票交易、跨模块集成 | 120+ |
-| - | **08-理论笔记** | 激活函数、损失函数、架构选型速查 | 16+ |
-| V | **10-大语言模型** | Transformer、GPT/LLaMA、LoRA微调、RAG、Agent | 60+ |
-| V | **11-多模态学习** | CLIP、Stable Diffusion、Whisper、TTS | 47+ |
-| V | **12-部署优化** | 量化剪枝、TensorRT、FastAPI、MLOps | 50+ |
-| VI | **13-分布式训练** | DDP、FSDP、ZeRO、张量/流水线并行、混合精度 | 42+ |
-| VII | **14-智能体推理** | 工具调用、思维链、ReAct、思维树、多智能体、自主智能体 | 45+ |
-
-<details>
-<summary><b>📂 展开完整目录结构</b></summary>
+## 模块架构
 
 ```
 AI-Practices/
-├── 01-foundations/                 # 机器学习基础
-│   ├── 01-training-models/         # 梯度下降、正则化
-│   ├── 02-classification/          # 逻辑回归、SVM
-│   ├── 03-support-vector-machines/ # 核技巧、软间隔
-│   ├── 04-decision-trees/          # CART、剪枝
-│   ├── 05-ensemble-learning/       # Bagging、Boosting、Stacking
-│   ├── 06-dimensionality-reduction/# PCA、t-SNE、UMAP
-│   ├── 07-unsupervised-learning/   # K-Means、DBSCAN、GMM
-│   └── 08-end-to-end-project/      # 完整ML流程
 │
-├── 02-neural-networks/             # 神经网络
-│   ├── 01-keras-introduction/      # Sequential、Functional API
-│   ├── 02-training-deep-networks/  # BatchNorm、Dropout
-│   ├── 03-custom-models-training/  # 自定义层和训练循环
-│   └── 04-data-loading-preprocessing/
+├── 第一阶段：机器学习基础
+│   └── 01-foundations/              # 线性模型、SVM、决策树、集成学习、降维、聚类
 │
-├── 07-reinforcement-learning/      # 强化学习
-│   ├── 01-mdp-basics/              # 马尔可夫决策过程
-│   ├── 02-temporal-difference/     # TD学习
-│   ├── 03-q-learning/              # Q-Learning
-│   ├── 04-deep-q-learning/         # DQN、Double DQN
-│   ├── 05-policy-gradient/         # REINFORCE、PPO
-│   ├── 06-actor-critic/            # A2C、A3C
-│   └── 07-advanced-algorithms/     # SAC、TD3
+├── 第二阶段：深度学习核心
+│   ├── 02-neural-networks/          # 神经网络基础、优化器、正则化
+│   ├── 03-computer-vision/          # CNN架构、迁移学习、目标检测
+│   └── 04-sequence-models/          # RNN/LSTM、Attention、Transformer
 │
-├── 09-practical-projects/          # 实战项目
-│   ├── 01-ml-basics/               # Titanic、Otto
-│   ├── 02-computer-vision/         # MNIST CNN
-│   ├── 03-nlp/                     # 情感分析、NER
-│   ├── 04-time-series/             # 温度预测
-│   ├── 05-kaggle-competitions/     # 金牌方案
-│   ├── 06-reinforcement-learning/  # 游戏AI、股票交易
-│   └── 07-integrated-systems/      # 跨模块集成系统
+├── 第三阶段：高级专题
+│   ├── 05-advanced-topics/          # 函数式API、回调函数、模型优化
+│   ├── 06-generative-models/        # VAE、GAN、Diffusion Models
+│   └── 07-reinforcement-learning/   # DQN、PPO、SAC、Actor-Critic
 │
-├── 10-large-language-models/       # 大语言模型
-│   ├── 01-llm-fundamentals/        # Transformer架构
-│   ├── 02-pretrained-models/       # GPT、LLaMA实现
-│   ├── 03-fine-tuning/             # LoRA、QLoRA微调
-│   ├── 04-prompt-engineering/      # 提示工程
-│   ├── 05-rag/                     # 检索增强生成
-│   ├── 06-agents/                  # Agent系统
-│   └── 07-alignment/               # RLHF、DPO对齐
+├── 第四阶段：大模型与多模态
+│   ├── 10-large-language-models/    # Transformer、GPT/LLaMA、LoRA、RAG、Agent
+│   └── 11-multimodal-learning/      # CLIP、Stable Diffusion、Whisper、TTS
 │
-├── 11-multimodal-learning/         # 多模态学习
-│   ├── 01-vision-language/         # CLIP、BLIP、LLaVA
-│   ├── 02-image-generation/        # VAE、Diffusion、ControlNet
-│   └── 03-audio-models/            # Whisper、TTS
+├── 第五阶段：工程化部署
+│   ├── 12-deployment-optimization/  # 量化剪枝、TensorRT、FastAPI、MLOps
+│   └── 13-distributed-training/     # DDP、FSDP、ZeRO、混合精度训练
 │
-├── 12-deployment-optimization/     # 部署优化
-│   ├── 01-model-optimization/      # 量化、剪枝、蒸馏
-│   ├── 02-inference-engines/       # TensorRT、vLLM
-│   ├── 03-serving-systems/         # FastAPI、gRPC
-│   └── 04-mlops/                   # 实验追踪、监控
+├── 第六阶段：智能体系统
+│   └── 14-agents-reasoning/         # 工具调用、推理策略、多智能体、自主Agent
 │
-└── 13-distributed-training/        # 分布式训练
-    ├── 01-data-parallel/           # DDP、FSDP、ZeRO
-    ├── 02-model-parallel/          # 张量并行、流水线并行
-    ├── 03-mixed-precision/         # AMP、BF16、梯度缩放
-    └── 04-large-scale-training/    # DeepSpeed、Megatron
-
-└── 14-agents-reasoning/            # 智能体与推理
-    ├── 01-tool-use/                # 工具调用、Function Calling
-    ├── 02-reasoning/               # CoT、ReAct、ToT、反思
-    ├── 03-memory-systems/          # 短期/长期记忆
-    ├── 04-planning/                # 任务分解与规划
-    ├── 05-multi-agent/             # 多智能体协作
-    └── 06-autonomous-agent/        # 自主智能体
+├── 理论参考
+│   └── 08-theory-notes/             # 激活函数、损失函数、架构速查
+│
+└── 实战项目
+    └── 09-practical-projects/       # Kaggle竞赛、游戏AI、跨模块集成系统
 ```
 
-</details>
+---
+
+## 详细模块说明
+
+### 01-foundations | 机器学习基础
+
+| 子模块 | 核心内容 | 关键算法 |
+|:-------|:---------|:---------|
+| 01-training-models | 模型训练基础 | 线性回归、梯度下降、正则化 |
+| 02-classification | 分类算法 | 逻辑回归、MNIST实战 |
+| 03-support-vector-machines | 支持向量机 | 核技巧、软间隔、SVM回归 |
+| 04-decision-trees | 决策树 | CART、剪枝策略 |
+| 05-ensemble-learning | 集成学习 | Bagging、Boosting、XGBoost、Stacking |
+| 06-dimensionality-reduction | 降维技术 | PCA、t-SNE、LLE、UMAP |
+| 07-unsupervised-learning | 无监督学习 | K-Means、DBSCAN、GMM |
+| 08-end-to-end-project | 完整ML项目 | 加州房价预测 |
+
+### 02-neural-networks | 神经网络
+
+| 子模块 | 核心内容 |
+|:-------|:---------|
+| 01-keras-introduction | Keras入门、Sequential/Functional API |
+| 02-training-deep-networks | BatchNorm、Dropout、初始化策略 |
+| 03-custom-models-training | 自定义层、训练循环、TensorFlow底层 |
+| 04-data-loading-preprocessing | 数据管道、TFRecord、预处理 |
+
+### 03-computer-vision | 计算机视觉
+
+| 子模块 | 核心内容 |
+|:-------|:---------|
+| 01-cnn-basics | CNN基础、池化层、ResNet实现 |
+| 02-classic-architectures | 经典架构演进 |
+| 03-transfer-learning | 迁移学习、猫狗分类实战 |
+| 04-visualization | 特征可视化、中间层激活 |
+
+### 04-sequence-models | 序列模型
+
+| 子模块 | 核心内容 |
+|:-------|:---------|
+| 01-rnn-basics | RNN基础、LSTM、时间序列预测 |
+| 02-lstm-gru | LSTM/GRU高级用法 |
+| 03-text-processing | 词嵌入、One-hot编码 |
+| 04-cnn-for-sequences | 一维卷积处理序列 |
+| 05-transformer | Self-Attention、Multi-Head、BERT/GPT基础 |
+
+### 05-advanced-topics | 高级专题
+
+| 子模块 | 核心内容 |
+|:-------|:---------|
+| 01-functional-api | 多输入多输出、残差连接、Inception |
+| 02-callbacks-tensorboard | 回调函数、TensorBoard可视化 |
+| 03-model-optimization | 量化、剪枝、知识蒸馏、部署 |
+
+### 06-generative-models | 生成模型
+
+| 子模块 | 核心内容 |
+|:-------|:---------|
+| 01-vae | Vanilla AE、VAE、VQ-VAE |
+| 02-gans | GAN、DCGAN、WGAN-GP |
+| 03-diffusion | DDPM原理与实现 |
+| 04-text-generation | 字符级LSTM文本生成 |
+| 05-deepdream | DeepDream艺术生成 |
+
+### 07-reinforcement-learning | 强化学习
+
+| 子模块 | 核心内容 | 测试覆盖 |
+|:-------|:---------|:---------|
+| 01-mdp-basics | MDP、值迭代、策略迭代 | ✅ |
+| 02-temporal-difference | TD学习、SARSA | ✅ |
+| 03-q-learning | Q-Learning、探索策略 | ✅ |
+| 04-deep-q-learning | DQN、Double DQN、Dueling DQN、Rainbow | ✅ |
+| 05-policy-gradient | REINFORCE、基线方法 | ✅ |
+| 06-actor-critic | A2C、PPO | ✅ |
+| 07-advanced-algorithms | SAC、TD3、DDPG | ✅ |
+| 08-reward-optimization | 奖励塑形、好奇心驱动、逆强化学习 | ✅ |
+
+### 08-theory-notes | 理论笔记
+
+快速参考手册，包含：
+- 激活函数对比与选择
+- 损失函数详解
+- 网络架构速查（CNN、RNN、Dense）
+
+### 09-practical-projects | 实战项目
+
+| 子模块 | 项目内容 |
+|:-------|:---------|
+| 01-ml-basics | Titanic生存预测、Otto分类、SVM文本分类、XGBoost进阶 |
+| 02-computer-vision | MNIST CNN分类 |
+| 03-nlp | 情感分析LSTM、Transformer文本分类、NER、机器翻译 |
+| 04-time-series | 温度预测、股票预测LSTM |
+| 05-kaggle-competitions | **4个Kaggle竞赛方案**（含2个金牌） |
+| 06-reinforcement-learning | Flappy Bird DQN、Dino Run、股票交易RL |
+| 07-integrated-systems | 多模态检索、视觉问答Agent、代码助手（109个测试） |
+
+#### Kaggle竞赛成绩
+
+| 竞赛 | 排名 | 奖牌 |
+|:-----|:----:|:----:|
+| Feedback Prize - ELL | Top 1% | 🥇 金牌 |
+| RSNA Abdominal Trauma | Top 1% | 🥇 金牌 |
+| American Express Default | Top 5% | 🥈 银牌 |
+| RSNA Lumbar Spine | Top 10% | 🥉 铜牌 |
+
+### 10-large-language-models | 大语言模型
+
+| 子模块 | 核心内容 | 测试覆盖 |
+|:-------|:---------|:---------|
+| 01-llm-fundamentals | Transformer架构、Tokenizer | ✅ |
+| 02-pretrained-models | GPT、LLaMA从零实现 | ✅ |
+| 03-fine-tuning | LoRA、QLoRA高效微调 | ✅ |
+| 04-prompt-engineering | Few-shot、Chain-of-Thought | ✅ |
+| 05-rag | 向量数据库、检索增强生成 | ✅ |
+| 06-agents | 工具调用、记忆管理 | ✅ |
+| 07-alignment | RLHF、DPO对齐训练 | ✅ |
+
+### 11-multimodal-learning | 多模态学习
+
+| 子模块 | 核心内容 | 测试覆盖 |
+|:-------|:---------|:---------|
+| 01-vision-language | CLIP、BLIP、LLaVA | ✅ |
+| 02-image-generation | VAE、Diffusion、ControlNet | ✅ |
+| 03-audio-models | Whisper语音识别、TTS语音合成 | ✅ |
+
+### 12-deployment-optimization | 部署优化
+
+| 子模块 | 核心内容 | 测试覆盖 |
+|:-------|:---------|:---------|
+| 01-model-optimization | 量化、剪枝、蒸馏、ONNX导出 | ✅ |
+| 02-inference-engines | TensorRT、vLLM、ONNX Runtime | ✅ |
+| 03-serving-systems | FastAPI、Triton、负载均衡 | ✅ |
+| 04-mlops | 实验追踪、模型注册、监控告警 | ✅ |
+
+### 13-distributed-training | 分布式训练
+
+| 子模块 | 核心内容 | 测试覆盖 |
+|:-------|:---------|:---------|
+| 01-data-parallel | DDP、FSDP、ZeRO | ✅ |
+| 02-model-parallel | 张量并行、流水线并行、序列并行 | ✅ |
+| 03-mixed-precision | AMP、BF16、梯度缩放 | ✅ |
+| 04-large-scale-training | DeepSpeed、Megatron-LM | ✅ |
+
+### 14-agents-reasoning | 智能体与推理
+
+| 子模块 | 核心内容 | 测试覆盖 |
+|:-------|:---------|:---------|
+| 01-tool-use | Function Calling、工具注册、结构化输出 | ✅ |
+| 02-reasoning | CoT、ReAct、ToT、自一致性、反思 | ✅ |
+| 03-memory-systems | 短期记忆、长期记忆、向量检索 | ✅ |
+| 04-planning | 任务分解、计划生成、动态重规划 | ✅ |
+| 05-multi-agent | 辩论式推理、协作式推理、共识达成 | ✅ |
+| 06-autonomous-agent | 目标管理、行动执行、自主循环 | ✅ |
 
 ---
 
 ## 核心算法覆盖
 
-### 机器学习基础
+### 机器学习
 
-| 领域 | 算法 | 应用场景 |
-|:-----|:-----|:---------|
-| **线性模型** | OLS, Ridge, Lasso, ElasticNet | 回归预测、特征选择 |
-| **分类算法** | Logistic Regression, SVM, KNN | 二分类、多分类 |
-| **树模型** | Decision Tree, Random Forest, GBDT | 结构化数据建模 |
-| **集成学习** | Bagging, Boosting, Stacking, XGBoost, LightGBM | 竞赛首选方案 |
-| **降维聚类** | PCA, t-SNE, UMAP, K-Means, DBSCAN | 数据可视化、无监督学习 |
+```
+线性模型: OLS, Ridge, Lasso, ElasticNet
+分类算法: Logistic Regression, SVM, KNN
+树模型: Decision Tree, Random Forest, GBDT
+集成学习: Bagging, Boosting, Stacking, XGBoost, LightGBM
+降维聚类: PCA, t-SNE, UMAP, K-Means, DBSCAN
+```
 
 ### 深度学习
 
-| 领域 | 技术 | 核心概念 |
-|:-----|:-----|:---------|
-| **优化器** | SGD, Momentum, Adam, AdamW, LAMB | 收敛速度、泛化性能 |
-| **正则化** | Dropout, BatchNorm, LayerNorm, Weight Decay | 防止过拟合 |
-| **初始化** | Xavier, He, Orthogonal | 梯度稳定性 |
-| **学习率** | Step Decay, Cosine Annealing, Warmup | 训练策略 |
-
-### 计算机视觉
-
-**CNN架构演进**:
 ```
-LeNet (1998) → AlexNet (2012) → VGG (2014) → GoogLeNet (2014) → ResNet (2015)
-                                                                      ↓
-                        ViT (2020) ← EfficientNet (2019) ← DenseNet (2016)
+优化器: SGD, Momentum, Adam, AdamW, LAMB
+正则化: Dropout, BatchNorm, LayerNorm, Weight Decay
+CNN架构: LeNet → AlexNet → VGG → ResNet → EfficientNet → ViT
+序列模型: RNN → LSTM → GRU → Transformer → BERT → GPT
 ```
-
-| 任务 | 模型/方法 | 说明 |
-|:-----|:----------|:-----|
-| **图像分类** | ResNet, EfficientNet, ViT | ImageNet SOTA |
-| **目标检测** | YOLO, Faster R-CNN, DETR | 实时检测 |
-| **语义分割** | U-Net, DeepLab, Mask R-CNN | 像素级分类 |
-| **迁移学习** | Fine-tuning, Feature Extraction | 小样本学习 |
-
-### 自然语言处理
-
-**Transformer架构** *(Vaswani et al., 2017)*:
-
-$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
-
-| 任务 | 模型 | 应用 |
-|:-----|:-----|:-----|
-| **文本分类** | BERT, RoBERTa | 情感分析、意图识别 |
-| **序列标注** | BiLSTM-CRF, BERT-NER | 命名实体识别 |
-| **文本生成** | GPT, T5 | 摘要、对话 |
-| **机器翻译** | Transformer, mBART | 多语言翻译 |
-
-### 生成模型
-
-| 类型 | 模型 | 应用 |
-|:-----|:-----|:-----|
-| **VAE** | Variational Autoencoder | 图像生成、表征学习 |
-| **GAN** | DCGAN, WGAN, StyleGAN | 图像合成、风格迁移 |
-| **Diffusion** | DDPM, Stable Diffusion | 高质量图像生成 |
-| **Neural Art** | DeepDream, Neural Style Transfer | 艺术创作 |
 
 ### 强化学习
 
-| 类别 | 算法 | 特点 |
-|:-----|:-----|:-----|
-| **值函数方法** | Q-Learning, DQN, Double DQN, Dueling DQN | 经验回放、目标网络 |
-| **策略梯度** | REINFORCE, PPO, TRPO, A3C | 直接优化策略 |
-| **Actor-Critic** | A2C, SAC, TD3 | 结合值函数与策略 |
-| **Model-Based** | Dyna-Q, World Models, MuZero | 环境建模 |
+```
+值函数方法: Q-Learning, DQN, Double DQN, Dueling DQN, Rainbow
+策略梯度: REINFORCE, PPO, TRPO
+Actor-Critic: A2C, A3C, SAC, TD3
+```
 
-**Bellman最优方程**:
+### 生成模型
 
-$$Q^*(s, a) = \mathbb{E}\left[r + \gamma \max_{a'} Q^*(s', a') \mid s, a\right]$$
+```
+自编码器: AE, VAE, VQ-VAE
+对抗网络: GAN, DCGAN, WGAN-GP, StyleGAN
+扩散模型: DDPM, Stable Diffusion
+```
 
-### 大语言模型
+### 大模型技术
 
-| 领域 | 技术 | 应用 |
-|:-----|:-----|:-----|
-| **模型架构** | Transformer、GPT、LLaMA | 文本生成、对话系统 |
-| **高效微调** | LoRA、QLoRA、Adapter | 低资源微调 |
-| **提示工程** | Few-shot、CoT、ReAct | 任务引导 |
-| **检索增强** | RAG、向量数据库 | 知识问答 |
-| **Agent系统** | 工具调用、记忆管理 | 自主任务执行 |
-| **对齐训练** | RLHF、DPO | 安全对齐 |
-
-### 多模态学习
-
-| 领域 | 模型 | 应用 |
-|:-----|:-----|:-----|
-| **视觉-语言** | CLIP、BLIP、LLaVA | 图文理解、VQA |
-| **图像生成** | VAE、Diffusion、ControlNet | 文生图、图像编辑 |
-| **语音识别** | Whisper | 多语言ASR |
-| **语音合成** | Tacotron、HiFi-GAN | 文本转语音 |
-
-### 部署优化
-
-| 领域 | 技术 | 说明 |
-|:-----|:-----|:-----|
-| **模型优化** | 量化、剪枝、蒸馏 | 模型压缩 |
-| **推理引擎** | TensorRT、vLLM、Triton | 高性能推理 |
-| **服务系统** | FastAPI、gRPC | API服务 |
-| **MLOps** | 实验追踪、模型注册、监控 | 生产运维 |
-
-### 分布式训练
-
-| 领域 | 技术 | 说明 |
-|:-----|:-----|:-----|
-| **数据并行** | DDP、FSDP、ZeRO | 梯度同步、内存优化 |
-| **模型并行** | 张量并行、流水线并行、序列并行 | 大模型切分 |
-| **混合精度** | AMP、BF16、梯度缩放 | 加速训练、节省显存 |
-| **大规模训练** | DeepSpeed、Megatron-LM | 百亿参数训练 |
-
-### 智能体与推理
-
-| 领域 | 技术 | 说明 |
-|:-----|:-----|:-----|
-| **工具调用** | Function Calling、工具注册、结构化输出 | LLM工具集成 |
-| **推理策略** | CoT、ReAct、ToT、自一致性 | 增强推理能力 |
-| **记忆系统** | 短期记忆、长期记忆、向量检索 | 上下文管理 |
-| **任务规划** | 任务分解、计划生成、动态重规划 | 复杂任务处理 |
-| **多智能体** | 辩论式推理、协作式推理、共识达成 | 多Agent协作 |
+```
+架构: Transformer, GPT, LLaMA
+微调: LoRA, QLoRA, Adapter
+推理: RAG, CoT, ReAct, ToT
+对齐: RLHF, DPO
+```
 
 ---
 
@@ -279,11 +284,11 @@ $$Q^*(s, a) = \mathbb{E}\left[r + \gamma \max_{a'} Q^*(s', a') \mid s, a\right]$
 
 <div align="center">
 
-| 深度学习 | 数据科学 | 开发工具 |
-|:--------:|:--------:|:--------:|
-| ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.13+-FF6F00?style=flat-square&logo=tensorflow&logoColor=white) | ![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.3+-F7931E?style=flat-square&logo=scikit-learn&logoColor=white) | ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat-square&logo=python&logoColor=white) |
-| ![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?style=flat-square&logo=pytorch&logoColor=white) | ![Pandas](https://img.shields.io/badge/Pandas-2.0+-150458?style=flat-square&logo=pandas&logoColor=white) | ![Jupyter](https://img.shields.io/badge/Jupyter-Lab_4+-F37626?style=flat-square&logo=jupyter&logoColor=white) |
-| ![Keras](https://img.shields.io/badge/Keras-3.x-D00000?style=flat-square&logo=keras&logoColor=white) | ![NumPy](https://img.shields.io/badge/NumPy-1.24+-013243?style=flat-square&logo=numpy&logoColor=white) | ![Docker](https://img.shields.io/badge/Docker-24+-2496ED?style=flat-square&logo=docker&logoColor=white) |
+| 深度学习框架 | 数据科学 | 开发工具 |
+|:------------:|:--------:|:--------:|
+| PyTorch 2.x | NumPy | Python 3.10+ |
+| TensorFlow 2.13+ | Pandas | Jupyter Lab |
+| Keras 3.x | Scikit-Learn | Docker |
 
 </div>
 
@@ -318,18 +323,33 @@ jupyter lab
 
 ---
 
-## 竞赛成绩
+## 学习路径建议
 
-<div align="center">
+```
+入门阶段 (1-2个月)
+├── 01-foundations          # 机器学习基础
+├── 02-neural-networks      # 神经网络入门
+└── 08-theory-notes         # 理论参考
 
-| 竞赛 | 排名 | 奖牌 | 年份 |
-|:-----|:----:|:----:|:----:|
-| **Feedback Prize - ELL** | Top 1% | 金牌 | 2023 |
-| **RSNA Abdominal Trauma** | Top 1% | 金牌 | 2023 |
-| American Express Default | Top 5% | 银牌 | 2022 |
-| RSNA Lumbar Spine | Top 10% | 铜牌 | 2024 |
+进阶阶段 (2-3个月)
+├── 03-computer-vision      # 计算机视觉
+├── 04-sequence-models      # 序列模型
+├── 05-advanced-topics      # 高级专题
+└── 06-generative-models    # 生成模型
 
-</div>
+高级阶段 (2-3个月)
+├── 07-reinforcement-learning  # 强化学习
+├── 10-large-language-models   # 大语言模型
+└── 11-multimodal-learning     # 多模态学习
+
+工程化阶段 (1-2个月)
+├── 12-deployment-optimization # 部署优化
+├── 13-distributed-training    # 分布式训练
+└── 14-agents-reasoning        # 智能体系统
+
+实战阶段 (持续)
+└── 09-practical-projects      # 项目实战
+```
 
 ---
 
@@ -338,7 +358,7 @@ jupyter lab
 ```bibtex
 @misc{ai-practices2024,
   author       = {zimingttkx},
-  title        = {AI-Practices: 系统化人工智能学习与研究平台},
+  title        = {AI-Practices: 系统化人工智能学习与实践平台},
   year         = {2024},
   publisher    = {GitHub},
   howpublished = {\url{https://github.com/zimingttkx/AI-Practices}}
@@ -355,7 +375,7 @@ jupyter lab
 
 <div align="center">
 
-**如果这个项目对你有帮助，请给一个 Star！**
+**如果这个项目对你有帮助，请给一个 ⭐ Star！**
 
 [![Report Bug](https://img.shields.io/badge/Report-Bug-red?style=for-the-badge)](https://github.com/zimingttkx/AI-Practices/issues)
 [![Request Feature](https://img.shields.io/badge/Request-Feature-blue?style=for-the-badge)](https://github.com/zimingttkx/AI-Practices/issues)
