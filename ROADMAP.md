@@ -6,6 +6,24 @@
 
 ## 最新进展 (2026-01-12)
 
+### 已完成：02-image-generation 深度增强
+
+对 `11-multimodal-learning/02-image-generation` 进行了深度增强，新增约 3500+ 行代码和 184 个单元测试：
+
+| 文件 | 行数 | 新增功能 |
+|------|------|---------|
+| samplers.py | ~1160 | DPM++、UniPC、Euler、Heun、LMS 高级采样器 |
+| sdxl.py | ~1240 | SDXL 架构、双文本编码器、UNet、噪声调度器 |
+| lora.py | ~530 | LoRA/LoHA/LoKr/DyLoRA 微调、注入管理器 |
+| ip_adapter.py | ~530 | IP-Adapter、图像投影、解耦交叉注意力 |
+
+**测试覆盖：**
+- samplers: 68 tests ✅
+- sdxl: 40 tests ✅
+- lora: 44 tests ✅
+- ip_adapter: 32 tests ✅
+- 总计: 262 tests (含原有测试)
+
 ### 已完成：01-vision-language 深度增强
 
 对 `11-multimodal-learning/01-vision-language` 进行了深度增强，代码量从约 1900 行扩展到约 4077 行：
@@ -21,11 +39,11 @@
 #### Phase 9: 深度增强 (进行中)
 
 **优先级 P0 - 核心增强：**
-- [ ] 02-image-generation 增强
-  - [ ] SDXL 架构支持
-  - [ ] IP-Adapter 图像提示
-  - [ ] LoRA/LyCORIS 微调
-  - [ ] 高级采样器 (DPM++, UniPC)
+- [x] 02-image-generation 增强
+  - [x] SDXL 架构支持
+  - [x] IP-Adapter 图像提示
+  - [x] LoRA/LyCORIS 微调
+  - [x] 高级采样器 (DPM++, UniPC, Euler, Heun, LMS)
 - [ ] 03-audio-models 增强
   - [ ] Wav2Vec2 自监督学习
   - [ ] FastSpeech2 非自回归TTS
