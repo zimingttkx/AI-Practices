@@ -1,6 +1,55 @@
 # AI-Practices 项目路线图
 
-> **最后更新**: 2026-01-10 | **当前阶段**: Phase 8 - 跨模块集成系统 (已完成)
+> **最后更新**: 2026-01-12 | **当前阶段**: Phase 9 - 深度增强与优化
+
+---
+
+## 最新进展 (2026-01-12)
+
+### 已完成：01-vision-language 深度增强
+
+对 `11-multimodal-learning/01-vision-language` 进行了深度增强，代码量从约 1900 行扩展到约 4077 行：
+
+| 文件 | 原始行数 | 增强后行数 | 新增功能 |
+|------|---------|-----------|---------|
+| clip.py | ~500 | ~1200 | SigLIP损失、多尺度训练、梯度检查点、Adapter/LinearProbe/CLIPFineTuner |
+| blip.py | ~700 | ~1488 | Q-Former、Beam/Nucleus采样、VQAHead、BLIP2、InstructBLIP |
+| llava.py | ~700 | ~1389 | LoRA微调、AnyRes高分辨率、多图像输入、视觉定位、流式生成 |
+
+### 未来开发方向
+
+#### Phase 9: 深度增强 (进行中)
+
+**优先级 P0 - 核心增强：**
+- [ ] 02-image-generation 增强
+  - [ ] SDXL 架构支持
+  - [ ] IP-Adapter 图像提示
+  - [ ] LoRA/LyCORIS 微调
+  - [ ] 高级采样器 (DPM++, UniPC)
+- [ ] 03-audio-models 增强
+  - [ ] Wav2Vec2 自监督学习
+  - [ ] FastSpeech2 非自回归TTS
+  - [ ] VITS 端到端语音合成
+  - [ ] 声音克隆基础
+
+**优先级 P1 - 新模型实现：**
+- [ ] 01-vision-language 新文件
+  - [ ] siglip.py - 独立 SigLIP 实现
+  - [ ] cogvlm.py - CogVLM 架构
+  - [ ] qwen_vl.py - Qwen-VL 架构
+- [ ] 评估工具
+  - [ ] evaluation.py - 多模态评估指标
+
+**优先级 P2 - 工程优化：**
+- [ ] 统一的模型加载接口
+- [ ] 预训练权重转换工具
+- [ ] 推理优化 (Flash Attention, KV Cache)
+
+#### Phase 10: 跨模块集成 (规划中)
+
+- [ ] 多模态 RAG 系统
+- [ ] 视觉-语言-音频统一模型
+- [ ] 端到端多模态对话系统
 
 ---
 
@@ -427,20 +476,40 @@ networkx = "^3.0"          # 图结构 (ToT/规划)
 
 ### 详细任务清单
 
-#### 01-vision-language (已完成)
+#### 01-vision-language (已完成 - 深度增强)
 
-- [x] CLIP 对比学习实现
+- [x] CLIP 对比学习实现 (~500行 → ~1200行)
   - [x] 图像编码器 (ViT)
   - [x] 文本编码器 (Transformer)
   - [x] 对比损失函数
+  - [x] **SigLIP 损失函数** (sigmoid-based)
+  - [x] **多尺度训练** (位置编码插值)
+  - [x] **梯度检查点** (内存优化)
+  - [x] **Adapter/LinearProbe** (微调工具)
+  - [x] **ZeroShotClassifier** (零样本分类)
+  - [x] **CLIPFineTuner** (完整微调流程)
   - [x] 单元测试 (26 tests)
-- [x] BLIP 图文理解
+- [x] BLIP 图文理解 (~700行 → ~1488行)
   - [x] 图像-文本匹配 (ITM)
   - [x] 图像描述生成 (LM)
+  - [x] **QFormerConfig** (BLIP-2 配置)
+  - [x] **QFormerBlock** (自注意力+交叉注意力)
+  - [x] **QFormer** (可学习查询向量)
+  - [x] **GenerationMixin** (Greedy/Beam/Nucleus采样)
+  - [x] **VQAHead** (视觉问答分类头)
+  - [x] **BLIP2** (带Q-Former的完整模型)
+  - [x] **InstructBLIP** (指令微调版本)
   - [x] 单元测试 (28 tests)
-- [x] LLaVA 多模态对话
+- [x] LLaVA 多模态对话 (~700行 → ~1389行)
   - [x] 视觉投影层
   - [x] LLaMA 风格语言模型
+  - [x] **LoRAConfig** (低秩适应配置)
+  - [x] **LoRALinear** (LoRA线性层)
+  - [x] **AnyResProcessor** (高分辨率处理)
+  - [x] **MultiImageLLaVA** (多图像输入)
+  - [x] **VisualGroundingHead** (视觉定位)
+  - [x] **LLaVAWithGrounding** (带定位的LLaVA)
+  - [x] **StreamingGenerator** (流式生成)
   - [x] 单元测试 (23 tests)
 
 #### 02-image-generation (已完成)
