@@ -22,64 +22,34 @@ LLaVA 采用简洁高效的架构设计，将预训练的视觉编码器与大�
    - 接收视觉 token 和文本 token 的混合序列
    - 生成多模态对话响应
 
+=== LLaVA-1.5/1.6 增强 ===
+
+1. 高分辨率处理 (AnyRes):
+   - 支持动态分辨率输入
+   - 将高分辨率图像分割为多个子图
+   - 保留全局和局部视觉信息
+
+2. 多图像输入:
+   - 支持单次对话中处理多张图像
+   - 图像间的交叉注意力
+   - 灵活的图像位置编码
+
+3. LoRA 微调:
+   - 低秩适应实现高效微调
+   - 仅训练少量参数
+   - 支持多任务适配器
+
 === 数学基础 ===
 
 视觉特征投影:
     H_v = Projector(VisionEncoder(I))
-    
-    其中:
-    - I: 输入图像 [B, 3, H, W]
-    - VisionEncoder: CLIP ViT 编码器
-    - Projector: 线性层或 MLP
-    - H_v: 视觉 token [B, N_patches, D_llm]
 
 旋转位置编码 (RoPE):
     q' = q * cos(mθ) + rotate(q) * sin(mθ)
     k' = k * cos(mθ) + rotate(k) * sin(mθ)
-    
-    其中:
-    - m: 位置索引
-    - θ_i = 10000^(-2i/d): 频率
-    - rotate: 将向量分成两半并旋转
 
-RMSNorm 归一化:
-    RMSNorm(x) = x / RMS(x) * γ
-    RMS(x) = √(1/n * Σ x_i²)
-
-SwiGLU 激活:
-    SwiGLU(x) = Swish(xW_gate) ⊙ (xW_up)
-    Swish(x) = x * sigmoid(x)
-
-自回归语言建模损失:
-    L = -Σ log P(x_t | x_{<t}, H_v)
-
-=== 算法流程 ===
-
-训练阶段:
-    输入: 图像 I, 文本指令 T, 目标响应 R
-      ↓
-    视觉编码: H_v = Projector(VisionEncoder(I))  # [B, N, D]
-    文本嵌入: H_t = Embed(T)                      # [B, L, D]
-      ↓
-    拼接序列: H = [H_v; H_t]                      # [B, N+L, D]
-      ↓
-    语言模型: logits = LLM(H)
-      ↓
-    计算损失: L = CrossEntropy(logits, R)
-      ↓
-    反向传播更新参数
-
-推理阶段 (多模态对话):
-    输入: 图像 I, 用户问题 Q
-      ↓
-    视觉编码: H_v = Projector(VisionEncoder(I))
-    问题嵌入: H_q = Embed(Q)
-      ↓
-    拼接序列: H = [H_v; H_q]
-      ↓
-    自回归生成: A = LLM.generate(H)
-      ↓
-    输出: 模型回答 A
+LoRA 低秩分解:
+    W' = W + BA, where B ∈ R^{d×r}, A ∈ R^{r×k}, r << min(d,k)
 
 === 参考文献 ===
 
@@ -91,18 +61,21 @@ SwiGLU 激活:
    Liu et al. "Improved Baselines with Visual Instruction Tuning" 2023
    https://arxiv.org/abs/2310.03744
 
-3. LLaMA:
-   Touvron et al. "LLaMA: Open and Efficient Foundation Language Models" 2023
+3. LLaVA-NeXT:
+   Liu et al. "LLaVA-NeXT: Improved reasoning, OCR, and world knowledge" 2024
 
-4. RoPE 位置编码:
-   Su et al. "RoFormer: Enhanced Transformer with Rotary Position Embedding" 2021
+4. LoRA:
+   Hu et al. "LoRA: Low-Rank Adaptation of Large Language Models" ICLR 2022
 
 === 核心组件 ===
 
     - LLaVAConfig: LLaVA 模型配置
+    - LoRAConfig: LoRA 微调配置
     - PatchEmbedding: 图像分块嵌入
     - VisionEncoder: CLIP 风格视觉编码器
     - VisionProjector: 视觉特征投影层
+    - AnyResProcessor: 高分辨率图像处理器
+    - LoRALinear: LoRA 线性层
     - RMSNorm: RMS 归一化层
     - RotaryEmbedding: 旋转位置编码
     - LLaMAAttention: LLaMA 风格多头注意力 (带 RoPE)
@@ -110,18 +83,28 @@ SwiGLU 激活:
     - LLaMADecoderLayer: LLaMA 解码器层
     - LLaMAModel: 简化的 LLaMA 语言模型
     - LLaVA: 完整的多模态对话模型
+    - LLaVAWithLoRA: 带 LoRA 的 LLaVA
+    - VisualGroundingHead: 视觉定位头
     - create_llava_model: 创建预定义大小的 LLaVA 模型
 """
 
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
-from typing import Optional, Tuple, List, Dict, Any
+from dataclasses import dataclass, field
+from typing import Optional, Tuple, List, Dict, Any, Iterator, Union
+from enum import Enum
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+
+class ProjectorType(Enum):
+    """投影层类型"""
+    LINEAR = "linear"
+    MLP2X_GELU = "mlp2x_gelu"
+    RESAMPLER = "resampler"
 
 
 @dataclass
@@ -168,6 +151,53 @@ class LLaVAConfig:
     def __post_init__(self):
         assert self.image_size % self.patch_size == 0, \
             f"image_size ({self.image_size}) must be divisible by patch_size ({self.patch_size})"
+
+
+@dataclass
+class LoRAConfig:
+    """LoRA 微调配置
+    
+    LoRA (Low-Rank Adaptation) 通过低秩分解实现高效微调。
+    
+    数学原理:
+        W' = W + BA
+        其中 B ∈ R^{d×r}, A ∈ R^{r×k}, r << min(d,k)
+    """
+    
+    # LoRA 参数
+    rank: int = 8  # 低秩维度
+    alpha: float = 16.0  # 缩放因子
+    dropout: float = 0.05  # LoRA dropout
+    
+    # 目标模块
+    target_modules: List[str] = field(default_factory=lambda: [
+        "q_proj", "k_proj", "v_proj", "o_proj",
+        "gate_proj", "up_proj", "down_proj"
+    ])
+    
+    # 是否训练偏置
+    bias: str = "none"  # "none", "all", "lora_only"
+    
+    @property
+    def scaling(self) -> float:
+        """LoRA 缩放因子"""
+        return self.alpha / self.rank
+
+
+@dataclass
+class AnyResConfig:
+    """高分辨率处理配置 (AnyRes)"""
+    
+    # 基础分辨率
+    base_resolution: int = 336
+    
+    # 支持的分辨率网格
+    grid_sizes: List[Tuple[int, int]] = field(default_factory=lambda: [
+        (1, 1), (1, 2), (2, 1), (2, 2), (1, 3), (3, 1)
+    ])
+    
+    # 最大子图数量
+    max_patches: int = 6
 
 
 class PatchEmbedding(nn.Module):
@@ -871,3 +901,489 @@ def create_llava_model(model_size: str = "small") -> LLaVA:
         raise ValueError(f"Unknown model size: {model_size}. Choose from {list(configs.keys())}")
 
     return LLaVA(configs[model_size])
+
+
+# =============================================================================
+# LoRA 微调支持
+# =============================================================================
+
+
+class LoRALinear(nn.Module):
+    """LoRA 线性层
+    
+    通过低秩分解实现高效微调：W' = W + BA
+    """
+    
+    def __init__(
+        self,
+        in_features: int,
+        out_features: int,
+        rank: int = 8,
+        alpha: float = 16.0,
+        dropout: float = 0.0
+    ):
+        super().__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.rank = rank
+        self.scaling = alpha / rank
+        
+        # 原始权重 (冻结)
+        self.weight = nn.Parameter(torch.zeros(out_features, in_features), requires_grad=False)
+        
+        # LoRA 参数
+        self.lora_A = nn.Parameter(torch.zeros(rank, in_features))
+        self.lora_B = nn.Parameter(torch.zeros(out_features, rank))
+        self.lora_dropout = nn.Dropout(dropout) if dropout > 0 else nn.Identity()
+        
+        self._init_lora_weights()
+    
+    def _init_lora_weights(self):
+        nn.init.kaiming_uniform_(self.lora_A, a=math.sqrt(5))
+        nn.init.zeros_(self.lora_B)
+    
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # 原始前向传播
+        result = F.linear(x, self.weight)
+        # LoRA 增量
+        lora_out = self.lora_dropout(x) @ self.lora_A.T @ self.lora_B.T
+        return result + lora_out * self.scaling
+    
+    @classmethod
+    def from_linear(cls, linear: nn.Linear, rank: int = 8, alpha: float = 16.0, dropout: float = 0.0):
+        """从现有线性层创建 LoRA 层"""
+        lora_linear = cls(
+            linear.in_features, linear.out_features,
+            rank=rank, alpha=alpha, dropout=dropout
+        )
+        lora_linear.weight.data = linear.weight.data.clone()
+        return lora_linear
+
+
+def apply_lora_to_model(
+    model: nn.Module,
+    lora_config: LoRAConfig,
+    target_modules: Optional[List[str]] = None
+) -> nn.Module:
+    """将 LoRA 应用到模型的指定模块
+    
+    Args:
+        model: 原始模型
+        lora_config: LoRA 配置
+        target_modules: 目标模块名称列表
+    """
+    target_modules = target_modules or lora_config.target_modules
+    
+    for name, module in model.named_modules():
+        if any(target in name for target in target_modules):
+            if isinstance(module, nn.Linear):
+                parent_name = '.'.join(name.split('.')[:-1])
+                child_name = name.split('.')[-1]
+                parent = model.get_submodule(parent_name) if parent_name else model
+                
+                lora_layer = LoRALinear.from_linear(
+                    module,
+                    rank=lora_config.rank,
+                    alpha=lora_config.alpha,
+                    dropout=lora_config.dropout
+                )
+                setattr(parent, child_name, lora_layer)
+    
+    # 冻结非 LoRA 参数
+    for name, param in model.named_parameters():
+        if 'lora_' not in name:
+            param.requires_grad = False
+    
+    return model
+
+
+def get_lora_parameters(model: nn.Module) -> Iterator[nn.Parameter]:
+    """获取模型中的 LoRA 参数"""
+    for name, param in model.named_parameters():
+        if 'lora_' in name:
+            yield param
+
+
+def merge_lora_weights(model: nn.Module) -> nn.Module:
+    """将 LoRA 权重合并到原始权重中"""
+    for module in model.modules():
+        if isinstance(module, LoRALinear):
+            module.weight.data += (module.lora_B @ module.lora_A) * module.scaling
+            module.lora_A.data.zero_()
+            module.lora_B.data.zero_()
+    return model
+
+
+# =============================================================================
+# 高分辨率处理 (AnyRes)
+# =============================================================================
+
+
+class AnyResProcessor:
+    """高分辨率图像处理器 (LLaVA-NeXT 风格)
+    
+    将高分辨率图像分割为多个子图，保留全局和局部信息。
+    """
+    
+    def __init__(self, config: AnyResConfig):
+        self.config = config
+        self.base_res = config.base_resolution
+    
+    def select_best_grid(self, width: int, height: int) -> Tuple[int, int]:
+        """选择最佳网格大小"""
+        aspect_ratio = width / height
+        best_grid = (1, 1)
+        best_diff = float('inf')
+        
+        for grid in self.config.grid_sizes:
+            grid_aspect = grid[1] / grid[0]
+            diff = abs(aspect_ratio - grid_aspect)
+            if diff < best_diff:
+                best_diff = diff
+                best_grid = grid
+        
+        return best_grid
+    
+    def process_image(self, image: torch.Tensor) -> List[torch.Tensor]:
+        """处理高分辨率图像
+        
+        Args:
+            image: 输入图像 [3, H, W]
+            
+        Returns:
+            子图列表，包含全局图和局部子图
+        """
+        _, h, w = image.shape
+        grid_h, grid_w = self.select_best_grid(w, h)
+        
+        patches = []
+        
+        # 1. 全局图 (缩放到基础分辨率)
+        global_image = F.interpolate(
+            image.unsqueeze(0),
+            size=(self.base_res, self.base_res),
+            mode='bilinear',
+            align_corners=False
+        ).squeeze(0)
+        patches.append(global_image)
+        
+        # 2. 局部子图
+        patch_h = h // grid_h
+        patch_w = w // grid_w
+        
+        for i in range(grid_h):
+            for j in range(grid_w):
+                y1, y2 = i * patch_h, (i + 1) * patch_h
+                x1, x2 = j * patch_w, (j + 1) * patch_w
+                
+                patch = image[:, y1:y2, x1:x2]
+                patch = F.interpolate(
+                    patch.unsqueeze(0),
+                    size=(self.base_res, self.base_res),
+                    mode='bilinear',
+                    align_corners=False
+                ).squeeze(0)
+                patches.append(patch)
+        
+        return patches
+
+
+# =============================================================================
+# 多图像支持
+# =============================================================================
+
+
+class MultiImageLLaVA(LLaVA):
+    """支持多图像输入的 LLaVA
+    
+    扩展 LLaVA 以支持单次对话中处理多张图像。
+    """
+    
+    def __init__(self, config: LLaVAConfig, max_images: int = 5):
+        super().__init__(config)
+        self.max_images = max_images
+        
+        # 图像位置编码
+        self.image_position_embedding = nn.Embedding(max_images, config.hidden_size)
+    
+    def get_multi_image_features(
+        self,
+        images: List[torch.Tensor]
+    ) -> torch.Tensor:
+        """获取多张图像的特征
+        
+        Args:
+            images: 图像列表，每个 [3, H, W]
+            
+        Returns:
+            拼接的视觉特征 [1, total_patches, hidden_size]
+        """
+        all_features = []
+        
+        for idx, image in enumerate(images[:self.max_images]):
+            # 添加 batch 维度
+            image = image.unsqueeze(0)
+            features = self.get_vision_features(image)
+            
+            # 添加图像位置编码
+            pos_embed = self.image_position_embedding(
+                torch.tensor([idx], device=image.device)
+            ).unsqueeze(1)
+            features = features + pos_embed
+            
+            all_features.append(features)
+        
+        return torch.cat(all_features, dim=1)
+    
+    def forward_multi_image(
+        self,
+        input_ids: torch.Tensor,
+        images: List[torch.Tensor],
+        attention_mask: Optional[torch.Tensor] = None,
+        labels: Optional[torch.Tensor] = None
+    ) -> Dict[str, torch.Tensor]:
+        """多图像前向传播"""
+        text_embeds = self.language_model.get_input_embeddings()(input_ids)
+        vision_features = self.get_multi_image_features(images)
+        
+        # 拼接视觉和文本特征
+        inputs_embeds = torch.cat([vision_features, text_embeds], dim=1)
+        
+        # 调整 attention_mask
+        if attention_mask is not None:
+            num_vision_tokens = vision_features.shape[1]
+            vision_mask = torch.ones(
+                attention_mask.shape[0], num_vision_tokens,
+                device=attention_mask.device, dtype=attention_mask.dtype
+            )
+            attention_mask = torch.cat([vision_mask, attention_mask], dim=1)
+        
+        logits = self.language_model(inputs_embeds=inputs_embeds, attention_mask=attention_mask)
+        
+        output = {"logits": logits}
+        
+        if labels is not None:
+            shift_logits = logits[..., :-1, :].contiguous()
+            shift_labels = labels[..., 1:].contiguous()
+            loss = F.cross_entropy(
+                shift_logits.view(-1, shift_logits.size(-1)),
+                shift_labels.view(-1),
+                ignore_index=-100
+            )
+            output["loss"] = loss
+        
+        return output
+
+
+# =============================================================================
+# 视觉定位 (Visual Grounding)
+# =============================================================================
+
+
+class VisualGroundingHead(nn.Module):
+    """视觉定位头
+    
+    用于预测图像中物体的边界框坐标。
+    输出格式: [x_center, y_center, width, height] (归一化到 0-1)
+    """
+    
+    def __init__(self, hidden_size: int, num_layers: int = 2):
+        super().__init__()
+        
+        layers = []
+        for i in range(num_layers - 1):
+            layers.extend([
+                nn.Linear(hidden_size, hidden_size),
+                nn.ReLU(),
+                nn.Dropout(0.1)
+            ])
+        layers.append(nn.Linear(hidden_size, 4))  # [x, y, w, h]
+        
+        self.bbox_head = nn.Sequential(*layers)
+        self.sigmoid = nn.Sigmoid()
+    
+    def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            hidden_states: 隐藏状态 [batch_size, hidden_size]
+        Returns:
+            bbox: 边界框 [batch_size, 4]
+        """
+        bbox = self.bbox_head(hidden_states)
+        return self.sigmoid(bbox)
+
+
+class LLaVAWithGrounding(LLaVA):
+    """带视觉定位能力的 LLaVA"""
+    
+    def __init__(self, config: LLaVAConfig):
+        super().__init__(config)
+        self.grounding_head = VisualGroundingHead(config.hidden_size)
+        
+        # 特殊 token
+        self.box_start_token = "<box>"
+        self.box_end_token = "</box>"
+    
+    def forward_with_grounding(
+        self,
+        input_ids: torch.Tensor,
+        images: torch.Tensor,
+        attention_mask: Optional[torch.Tensor] = None,
+        box_positions: Optional[torch.Tensor] = None
+    ) -> Dict[str, torch.Tensor]:
+        """带定位的前向传播
+        
+        Args:
+            box_positions: 需要预测边界框的 token 位置
+        """
+        inputs_embeds = self.prepare_inputs_embeds(input_ids, images)
+        
+        if attention_mask is not None:
+            num_image_tokens = (self.config.image_size // self.config.patch_size) ** 2
+            image_mask = torch.ones(
+                attention_mask.shape[0], num_image_tokens,
+                device=attention_mask.device, dtype=attention_mask.dtype
+            )
+            attention_mask = torch.cat([image_mask, attention_mask], dim=1)
+        
+        # 获取语言模型的隐藏状态
+        hidden_states = inputs_embeds
+        for layer in self.language_model.layers:
+            hidden_states = layer(hidden_states, attention_mask)
+        hidden_states = self.language_model.norm(hidden_states)
+        
+        logits = self.language_model.lm_head(hidden_states)
+        
+        output = {"logits": logits}
+        
+        # 预测边界框
+        if box_positions is not None:
+            batch_size = hidden_states.shape[0]
+            box_hidden = []
+            for i in range(batch_size):
+                pos = box_positions[i]
+                box_hidden.append(hidden_states[i, pos, :])
+            box_hidden = torch.stack(box_hidden)
+            output["boxes"] = self.grounding_head(box_hidden)
+        
+        return output
+
+
+# =============================================================================
+# 流式生成
+# =============================================================================
+
+
+class StreamingGenerator:
+    """流式文本生成器
+    
+    支持逐 token 生成，适用于实时对话场景。
+    """
+    
+    def __init__(self, model: LLaVA):
+        self.model = model
+    
+    def stream_generate(
+        self,
+        input_ids: torch.Tensor,
+        images: Optional[torch.Tensor] = None,
+        max_new_tokens: int = 128,
+        temperature: float = 1.0,
+        top_p: float = 0.9,
+        top_k: int = 50,
+        eos_token_id: int = 2
+    ) -> Iterator[int]:
+        """流式生成 token
+        
+        Yields:
+            每次生成的 token ID
+        """
+        self.model.eval()
+        device = input_ids.device
+        
+        with torch.no_grad():
+            inputs_embeds = self.model.prepare_inputs_embeds(input_ids, images)
+            
+            for _ in range(max_new_tokens):
+                logits = self.model.language_model(inputs_embeds=inputs_embeds)
+                next_token_logits = logits[:, -1, :] / temperature
+                
+                # Top-k 过滤
+                if top_k > 0:
+                    indices_to_remove = next_token_logits < torch.topk(next_token_logits, top_k)[0][..., -1, None]
+                    next_token_logits = next_token_logits.masked_fill(indices_to_remove, float('-inf'))
+                
+                # Top-p 过滤
+                if top_p < 1.0:
+                    sorted_logits, sorted_indices = torch.sort(next_token_logits, descending=True)
+                    cumulative_probs = torch.cumsum(F.softmax(sorted_logits, dim=-1), dim=-1)
+                    sorted_indices_to_remove = cumulative_probs > top_p
+                    sorted_indices_to_remove[..., 1:] = sorted_indices_to_remove[..., :-1].clone()
+                    sorted_indices_to_remove[..., 0] = 0
+                    indices_to_remove = sorted_indices_to_remove.scatter(
+                        dim=-1, index=sorted_indices, src=sorted_indices_to_remove
+                    )
+                    next_token_logits = next_token_logits.masked_fill(indices_to_remove, float('-inf'))
+                
+                probs = F.softmax(next_token_logits, dim=-1)
+                next_token = torch.multinomial(probs, num_samples=1)
+                
+                token_id = next_token.item()
+                yield token_id
+                
+                if token_id == eos_token_id:
+                    break
+                
+                next_embeds = self.model.language_model.get_input_embeddings()(next_token)
+                inputs_embeds = torch.cat([inputs_embeds, next_embeds], dim=1)
+
+
+# =============================================================================
+# 工厂函数
+# =============================================================================
+
+
+def create_llava_with_lora(
+    model_size: str = "small",
+    lora_rank: int = 8,
+    lora_alpha: float = 16.0
+) -> LLaVA:
+    """创建带 LoRA 的 LLaVA 模型"""
+    model = create_llava_model(model_size)
+    lora_config = LoRAConfig(rank=lora_rank, alpha=lora_alpha)
+    return apply_lora_to_model(model, lora_config)
+
+
+def create_multi_image_llava(
+    model_size: str = "small",
+    max_images: int = 5
+) -> MultiImageLLaVA:
+    """创建多图像 LLaVA 模型"""
+    configs = {
+        "tiny": LLaVAConfig(
+            image_size=224, patch_size=14,
+            vision_layers=6, vision_width=384, vision_heads=6,
+            vocab_size=32000, max_seq_length=512,
+            hidden_size=512, num_layers=4, num_heads=8,
+            intermediate_size=1376, projector_type="mlp2x_gelu"
+        ),
+        "small": LLaVAConfig(
+            image_size=224, patch_size=14,
+            vision_layers=12, vision_width=768, vision_heads=12,
+            vocab_size=32000, max_seq_length=1024,
+            hidden_size=1024, num_layers=8, num_heads=16,
+            intermediate_size=2752, projector_type="mlp2x_gelu"
+        ),
+        "base": LLaVAConfig(
+            image_size=224, patch_size=14,
+            vision_layers=24, vision_width=1024, vision_heads=16,
+            vocab_size=32000, max_seq_length=2048,
+            hidden_size=2048, num_layers=16, num_heads=32,
+            intermediate_size=5504, projector_type="mlp2x_gelu"
+        ),
+    }
+    
+    if model_size not in configs:
+        raise ValueError(f"Unknown model size: {model_size}")
+    
+    return MultiImageLLaVA(configs[model_size], max_images=max_images)
