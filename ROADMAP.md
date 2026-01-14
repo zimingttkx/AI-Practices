@@ -1,6 +1,33 @@
 # AI-Practices 项目路线图
 
-> **最后更新**: 2026-01-13 | **当前阶段**: Phase 9 - 深度增强与优化
+> **最后更新**: 2026-01-14 | **当前阶段**: Phase 9 - 深度增强与优化
+
+---
+
+## 最新进展 (2026-01-14)
+
+### 已完成：01-vision-language P1 新模型实现
+
+对 `11-multimodal-learning/01-vision-language` 新增 4 个独立模型文件和配套教程：
+
+| 文件 | 行数 | 功能 |
+|------|------|------|
+| siglip.py | ~860 | SigLIP 独立实现 (Sigmoid 损失、SwiGLU、全局平均池化) |
+| cogvlm.py | ~693 | CogVLM 架构 (Visual Expert 深度融合、RoPE、GQA) |
+| qwen_vl.py | ~610 | Qwen-VL 架构 (Visual Resampler 特征压缩) |
+| evaluation.py | ~676 | 多模态评估指标 (BLEU、ROUGE、CIDEr、VQA、IoU) |
+
+**教程 Notebooks：**
+- 06_SigLIP_tutorial.ipynb - Sigmoid 损失原理、与 CLIP 对比
+- 07_CogVLM_tutorial.ipynb - Visual Expert 模块设计
+- 08_QwenVL_tutorial.ipynb - Visual Resampler 特征压缩
+- 09_Evaluation_tutorial.ipynb - 多模态评估方法
+
+**知识点文档更新：**
+- 第 16 章：SigLIP Sigmoid 损失详解
+- 第 17 章：CogVLM Visual Expert 架构
+- 第 18 章：Qwen-VL Visual Resampler 原理
+- 第 19 章：多模态评估指标详解
 
 ---
 
@@ -75,12 +102,12 @@
   - [x] 声音克隆基础
 
 **优先级 P1 - 新模型实现：**
-- [ ] 01-vision-language 新文件
-  - [ ] siglip.py - 独立 SigLIP 实现
-  - [ ] cogvlm.py - CogVLM 架构
-  - [ ] qwen_vl.py - Qwen-VL 架构
-- [ ] 评估工具
-  - [ ] evaluation.py - 多模态评估指标
+- [x] 01-vision-language 新文件
+  - [x] siglip.py - 独立 SigLIP 实现
+  - [x] cogvlm.py - CogVLM 架构
+  - [x] qwen_vl.py - Qwen-VL 架构
+- [x] 评估工具
+  - [x] evaluation.py - 多模态评估指标
 
 **优先级 P2 - 工程优化：**
 - [ ] 统一的模型加载接口
