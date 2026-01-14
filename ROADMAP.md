@@ -1,8 +1,263 @@
 # AI-Practices 项目路线图
 
-> **最后更新**: 2026-01-14 | **当前阶段**: Phase 9 - 深度增强与优化
+> **最后更新**: 2026-01-14 | **当前阶段**: Phase 10 - 前沿技术与工程卓越
 
 ---
+
+# 开发规范与指南
+
+> 本节为开发人员提供统一的开发标准，确保代码质量、风格一致性和高效协作。
+
+## 一、开发原则
+
+### 1.1 代码质量标准
+
+| 维度 | 要求 | 检查方式 |
+|:-----|:-----|:---------|
+| **可读性** | 代码自解释，命名清晰，逻辑分层 | Code Review |
+| **可测试性** | 每个模块必须有单元测试，覆盖率 > 80% | `pytest --cov` |
+| **可维护性** | 单一职责，低耦合，高内聚 | 静态分析 |
+| **性能** | 关键路径有性能测试，无明显瓶颈 | Benchmark |
+| **安全性** | 无硬编码密钥，输入验证完整 | 安全扫描 |
+
+### 1.2 文件结构规范
+
+```
+{module}/
+├── src/                          # 源代码 (必须)
+│   ├── __init__.py              # 模块导出
+│   ├── {feature}.py             # 功能实现 (每文件 300-800 行)
+│   └── utils.py                 # 工具函数
+├── tests/                        # 单元测试 (必须)
+│   ├── __init__.py
+│   ├── test_{feature}.py        # 对应测试
+│   └── conftest.py              # pytest fixtures
+├── notebooks/                    # Jupyter 教程 (必须)
+│   ├── 01_{Topic}_tutorial.ipynb
+│   └── ...
+├── 知识点.md                      # 技术文档 (必须，中文)
+└── README.md                     # 模块说明
+```
+
+### 1.3 代码风格
+
+```python
+"""
+模块文档字符串：简述功能、核心类/函数、参考文献
+
+参考文献:
+1. 论文名称 (作者, 年份)
+   https://arxiv.org/abs/xxxx.xxxxx
+"""
+
+from dataclasses import dataclass
+from typing import Optional, List, Dict, Tuple
+import torch
+import torch.nn as nn
+
+@dataclass
+class ModelConfig:
+    """配置类使用 dataclass，字段有类型注解和默认值"""
+    hidden_size: int = 768
+    num_layers: int = 12
+    dropout: float = 0.1
+
+class MyModel(nn.Module):
+    """
+    类文档：功能描述、参数说明、使用示例
+    
+    Args:
+        config: 模型配置
+    
+    Example:
+        >>> config = ModelConfig(hidden_size=512)
+        >>> model = MyModel(config)
+        >>> output = model(input_tensor)
+    """
+    
+    def __init__(self, config: ModelConfig):
+        super().__init__()
+        self.config = config
+        # 初始化代码...
+    
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """前向传播，参数和返回值有类型注解"""
+        pass
+
+def create_model(model_size: str = "base") -> MyModel:
+    """工厂函数：提供预设配置，降低使用门槛"""
+    configs = {
+        "base": ModelConfig(hidden_size=768),
+        "large": ModelConfig(hidden_size=1024),
+    }
+    return MyModel(configs[model_size])
+```
+
+### 1.4 测试规范
+
+```python
+"""测试文件示例"""
+import pytest
+import torch
+from src.my_model import MyModel, ModelConfig
+
+class TestMyModel:
+    """测试类按功能分组"""
+    
+    @pytest.fixture
+    def config(self):
+        """使用 fixture 提供测试数据"""
+        return ModelConfig(hidden_size=64, num_layers=2)
+    
+    @pytest.fixture
+    def model(self, config):
+        return MyModel(config)
+    
+    def test_forward_shape(self, model):
+        """测试输出形状"""
+        x = torch.randn(2, 10, 64)
+        output = model(x)
+        assert output.shape == (2, 10, 64)
+    
+    def test_config_validation(self):
+        """测试配置验证"""
+        with pytest.raises(ValueError):
+            ModelConfig(hidden_size=-1)
+    
+    @pytest.mark.parametrize("batch_size", [1, 4, 16])
+    def test_different_batch_sizes(self, model, batch_size):
+        """参数化测试"""
+        x = torch.randn(batch_size, 10, 64)
+        output = model(x)
+        assert output.shape[0] == batch_size
+```
+
+### 1.5 文档规范
+
+**知识点.md 结构：**
+```markdown
+# {模块名} 知识点
+
+## 1. 概述
+- 背景与动机
+- 核心问题定义
+- 解决方案概览
+
+## 2. 理论基础
+- 数学公式 (LaTeX)
+- 算法伪代码
+- 复杂度分析
+
+## 3. 核心实现
+- 架构图 (ASCII/Mermaid)
+- 关键代码解析
+- 设计决策说明
+
+## 4. 实践指南
+- 使用示例
+- 常见问题
+- 性能调优
+
+## 5. 参考资料
+- 论文链接
+- 官方文档
+- 相关项目
+```
+
+**Notebook 教程规范：**
+- 标题清晰，编号连续
+- 每个 cell 有 Markdown 说明
+- 代码可独立运行
+- 包含可视化输出
+- 难度循序渐进
+
+---
+
+## 二、开发流程
+
+### 2.1 新功能开发流程
+
+```
+1. 需求分析
+   ├── 阅读相关论文/文档
+   ├── 确定核心功能点
+   └── 评估工作量
+
+2. 设计阶段
+   ├── 定义接口 (Config, Model, Factory)
+   ├── 绘制架构图
+   └── 编写伪代码
+
+3. 实现阶段
+   ├── 先写测试 (TDD)
+   ├── 实现核心功能
+   ├── 添加边界检查
+   └── 优化性能
+
+4. 文档阶段
+   ├── 编写知识点.md
+   ├── 创建 Notebook 教程
+   └── 更新 __init__.py 导出
+
+5. 验证阶段
+   ├── 运行全部测试
+   ├── 检查代码风格
+   └── 性能基准测试
+
+6. 提交阶段
+   ├── 分文件提交 (feat/docs/test)
+   ├── 更新 ROADMAP.md
+   └── 推送到远程
+```
+
+### 2.2 提交规范
+
+```
+类型(范围): 简短描述
+
+类型:
+- feat: 新功能
+- fix: 修复
+- docs: 文档
+- test: 测试
+- refactor: 重构
+- perf: 性能优化
+- chore: 构建/工具
+
+示例:
+feat(vision-language): 添加 SigLIP 模型实现
+docs(audio-models): 更新 Wav2Vec2 教程
+test(agents): 添加多智能体协作测试
+```
+
+---
+
+## 三、技术栈与依赖
+
+### 3.1 核心依赖
+
+| 类别 | 库 | 版本 | 用途 |
+|:-----|:---|:-----|:-----|
+| 深度学习 | PyTorch | >=2.0 | 模型实现 |
+| 模型库 | transformers | >=4.35 | 预训练模型 |
+| 微调 | peft | >=0.6 | LoRA/QLoRA |
+| 向量检索 | faiss-cpu | >=1.7 | 相似度搜索 |
+| 音频 | librosa | >=0.10 | 音频处理 |
+| 图像 | timm | >=0.9 | 视觉模型 |
+| 测试 | pytest | >=7.0 | 单元测试 |
+| 代码质量 | ruff | >=0.1 | Linting |
+
+### 3.2 添加新依赖原则
+
+1. **必要性**: 确认无法用现有库实现
+2. **稳定性**: 选择活跃维护的库
+3. **兼容性**: 检查与现有依赖的兼容
+4. **轻量级**: 优先选择轻量级方案
+5. **文档化**: 在 pyproject.toml 添加注释说明用途
+
+---
+
+# 未来开发计划
 
 ## 最新进展 (2026-01-14)
 
@@ -87,38 +342,157 @@
 
 ### 未来开发方向
 
-#### Phase 9: 深度增强 (进行中)
+#### Phase 10: 前沿技术与工程卓越 (当前阶段)
 
-**优先级 P0 - 核心增强：**
-- [x] 02-image-generation 增强
-  - [x] SDXL 架构支持
-  - [x] IP-Adapter 图像提示
-  - [x] LoRA/LyCORIS 微调
-  - [x] 高级采样器 (DPM++, UniPC, Euler, Heun, LMS)
-- [x] 03-audio-models 增强
-  - [x] Wav2Vec2 自监督学习
-  - [x] FastSpeech2 非自回归TTS
-  - [x] VITS 端到端语音合成
-  - [x] 声音克隆基础
+**优先级 P0 - 2026 前沿模型实现：**
 
-**优先级 P1 - 新模型实现：**
-- [x] 01-vision-language 新文件
-  - [x] siglip.py - 独立 SigLIP 实现
-  - [x] cogvlm.py - CogVLM 架构
-  - [x] qwen_vl.py - Qwen-VL 架构
-- [x] 评估工具
-  - [x] evaluation.py - 多模态评估指标
+| 任务 | 文件 | 预计行数 | 核心技术 |
+|:-----|:-----|:---------|:---------|
+| Mamba 状态空间模型 | `10-llm/08-efficient-architectures/mamba.py` | ~800 | S4/S6 选择性状态空间、线性复杂度 |
+| Mixture of Experts | `10-llm/08-efficient-architectures/moe.py` | ~700 | 稀疏门控、专家路由、负载均衡 |
+| Ring Attention | `13-distributed/05-long-context/ring_attention.py` | ~600 | 分布式长序列、环形通信 |
+| Flash Attention 3 | `12-deployment/05-attention-optimization/flash_attn.py` | ~500 | 硬件感知、异步流水线 |
 
-**优先级 P2 - 工程优化：**
-- [ ] 统一的模型加载接口
-- [ ] 预训练权重转换工具
-- [ ] 推理优化 (Flash Attention, KV Cache)
+**优先级 P1 - 多模态统一架构：**
 
-#### Phase 10: 跨模块集成 (规划中)
+| 任务 | 文件 | 预计行数 | 核心技术 |
+|:-----|:-----|:---------|:---------|
+| Unified-IO 2 | `11-multimodal/04-unified-models/unified_io.py` | ~900 | 任意模态输入输出、统一 tokenizer |
+| ImageBind | `11-multimodal/04-unified-models/imagebind.py` | ~700 | 6 模态对齐、跨模态检索 |
+| 4M (Massively Multimodal) | `11-multimodal/04-unified-models/4m.py` | ~800 | 任意到任意生成、模态 token 化 |
+| Video-LLaVA | `11-multimodal/05-video-understanding/video_llava.py` | ~750 | 视频理解、时序建模 |
 
-- [ ] 多模态 RAG 系统
-- [ ] 视觉-语言-音频统一模型
-- [ ] 端到端多模态对话系统
+**优先级 P2 - 高效推理与部署：**
+
+| 任务 | 文件 | 预计行数 | 核心技术 |
+|:-----|:-----|:---------|:---------|
+| Speculative Decoding | `12-deployment/06-fast-inference/speculative.py` | ~500 | 草稿模型、并行验证 |
+| Continuous Batching | `12-deployment/06-fast-inference/continuous_batch.py` | ~400 | 动态批处理、请求调度 |
+| PagedAttention | `12-deployment/06-fast-inference/paged_attention.py` | ~450 | KV Cache 分页、内存优化 |
+| AWQ 量化 | `12-deployment/01-model-optimization/awq.py` | ~400 | 激活感知量化、4-bit 推理 |
+
+---
+
+#### Phase 11: 智能体与自主系统 (规划中)
+
+**优先级 P0 - 高级 Agent 能力：**
+
+| 任务 | 文件 | 预计行数 | 核心技术 |
+|:-----|:-----|:---------|:---------|
+| Computer Use Agent | `14-agents/07-computer-use/computer_agent.py` | ~800 | 屏幕理解、GUI 操作、任务自动化 |
+| Code Agent | `14-agents/07-computer-use/code_agent.py` | ~700 | 代码生成、调试、重构 |
+| Browser Agent | `14-agents/08-web-agents/browser_agent.py` | ~650 | 网页导航、表单填写、信息提取 |
+| API Agent | `14-agents/08-web-agents/api_agent.py` | ~500 | API 发现、调用链、错误恢复 |
+
+**优先级 P1 - Agent 基础设施：**
+
+| 任务 | 文件 | 预计行数 | 核心技术 |
+|:-----|:-----|:---------|:---------|
+| Agent Sandbox | `14-agents/09-safety/sandbox.py` | ~600 | 隔离执行、权限控制、资源限制 |
+| Agent Evaluation | `14-agents/09-safety/evaluation.py` | ~500 | 任务成功率、安全性评估 |
+| Human-in-the-Loop | `14-agents/10-human-loop/hitl.py` | ~450 | 人工审核、干预机制 |
+| Agent Observability | `14-agents/10-human-loop/observability.py` | ~400 | 执行追踪、决策解释 |
+
+---
+
+#### Phase 12: 对齐与安全 (规划中)
+
+**优先级 P0 - 对齐技术：**
+
+| 任务 | 文件 | 预计行数 | 核心技术 |
+|:-----|:-----|:---------|:---------|
+| Constitutional AI | `10-llm/07-alignment/constitutional.py` | ~600 | 自我批评、原则引导 |
+| RLAIF | `10-llm/07-alignment/rlaif.py` | ~550 | AI 反馈、无人工标注 |
+| KTO | `10-llm/07-alignment/kto.py` | ~400 | Kahneman-Tversky 优化 |
+| ORPO | `10-llm/07-alignment/orpo.py` | ~400 | 无参考模型对齐 |
+
+**优先级 P1 - 安全与可解释性：**
+
+| 任务 | 文件 | 预计行数 | 核心技术 |
+|:-----|:-----|:---------|:---------|
+| Activation Steering | `10-llm/09-interpretability/steering.py` | ~500 | 激活向量、行为控制 |
+| Probing Classifiers | `10-llm/09-interpretability/probing.py` | ~400 | 内部表示分析 |
+| Mechanistic Interp | `10-llm/09-interpretability/circuits.py` | ~600 | 电路分析、特征可视化 |
+| Red Teaming | `10-llm/10-safety/red_team.py` | ~500 | 对抗测试、漏洞发现 |
+
+---
+
+#### Phase 13: 数据与训练优化 (规划中)
+
+**优先级 P0 - 数据工程：**
+
+| 任务 | 文件 | 预计行数 | 核心技术 |
+|:-----|:-----|:---------|:---------|
+| Data Deduplication | `utils/data/deduplication.py` | ~500 | MinHash、SimHash、语义去重 |
+| Data Quality Filter | `utils/data/quality_filter.py` | ~600 | 质量评分、毒性过滤 |
+| Synthetic Data Gen | `utils/data/synthetic.py` | ~700 | 指令生成、数据增强 |
+| Curriculum Learning | `utils/training/curriculum.py` | ~450 | 难度排序、渐进训练 |
+
+**优先级 P1 - 训练优化：**
+
+| 任务 | 文件 | 预计行数 | 核心技术 |
+|:-----|:-----|:---------|:---------|
+| Gradient Checkpointing | `utils/training/checkpointing.py` | ~400 | 内存优化、重计算策略 |
+| Optimizer Variants | `utils/training/optimizers.py` | ~500 | Lion、Sophia、Adalomo |
+| Learning Rate Schedules | `utils/training/schedulers.py` | ~400 | WSD、Cosine Annealing |
+| Loss Functions | `utils/training/losses.py` | ~450 | Focal、Label Smoothing |
+
+---
+
+### 开发优先级矩阵
+
+```
+                    高影响力
+                       │
+    ┌──────────────────┼──────────────────┐
+    │                  │                  │
+    │   P1: 重要但     │   P0: 立即执行   │
+    │   可延后         │   (前沿模型)     │
+    │   (对齐/安全)    │                  │
+    │                  │                  │
+低紧迫度 ─────────────┼───────────────── 高紧迫度
+    │                  │                  │
+    │   P3: 可选       │   P2: 尽快完成   │
+    │   (实验性功能)   │   (推理优化)     │
+    │                  │                  │
+    └──────────────────┼──────────────────┘
+                       │
+                    低影响力
+```
+
+---
+
+### 里程碑规划
+
+| 里程碑 | 目标日期 | 核心交付物 |
+|:-------|:---------|:-----------|
+| **M1: 高效架构** | 2026-02-01 | Mamba、MoE、Ring Attention |
+| **M2: 统一多模态** | 2026-02-15 | Unified-IO、ImageBind、Video-LLaVA |
+| **M3: 推理优化** | 2026-03-01 | Speculative Decoding、PagedAttention |
+| **M4: 高级 Agent** | 2026-03-15 | Computer Use、Browser Agent |
+| **M5: 对齐安全** | 2026-04-01 | Constitutional AI、Red Teaming |
+| **M6: 数据工程** | 2026-04-15 | 数据质量、合成数据 |
+
+---
+
+### 已完成任务归档
+
+#### Phase 9: 深度增强 (已完成 ✅)
+
+**P0 - 核心增强：**
+- [x] 02-image-generation 增强 (SDXL、IP-Adapter、LoRA、高级采样器)
+- [x] 03-audio-models 增强 (Wav2Vec2、FastSpeech2、VITS、声音克隆)
+
+**P1 - 新模型实现：**
+- [x] siglip.py - 独立 SigLIP 实现
+- [x] cogvlm.py - CogVLM 架构
+- [x] qwen_vl.py - Qwen-VL 架构
+- [x] evaluation.py - 多模态评估指标
+
+**P2 - 工程优化：**
+- [ ] 统一的模型加载接口 (移至 Phase 10)
+- [ ] 预训练权重转换工具 (移至 Phase 10)
+- [ ] 推理优化 (移至 Phase 10)
 
 ---
 
