@@ -1,7 +1,7 @@
 """
 模型优化模块
 
-提供量化、剪枝、知识蒸馏和模型导出功能。
+提供量化、剪枝、知识蒸馏、模型导出和 AWQ 量化功能。
 """
 
 from .quantization import (
@@ -60,6 +60,21 @@ from .export import (
     compare_model_outputs,
 )
 
+from .awq import (
+    AWQConfig,
+    AWQGranularity,
+    ActivationObserver,
+    SalientChannelFinder,
+    AWQLinear,
+    AWQQuantizer,
+    create_awq_quantizer,
+    quantize_model_awq,
+    compute_quantization_error,
+    estimate_model_size,
+    pack_int4_weights,
+    unpack_int4_weights,
+)
+
 __all__ = [
     # Quantization
     "QuantizationConfig",
@@ -109,4 +124,17 @@ __all__ = [
     "export_to_onnx",
     "export_to_torchscript",
     "compare_model_outputs",
+    # AWQ Quantization
+    "AWQConfig",
+    "AWQGranularity",
+    "ActivationObserver",
+    "SalientChannelFinder",
+    "AWQLinear",
+    "AWQQuantizer",
+    "create_awq_quantizer",
+    "quantize_model_awq",
+    "compute_quantization_error",
+    "estimate_model_size",
+    "pack_int4_weights",
+    "unpack_int4_weights",
 ]
