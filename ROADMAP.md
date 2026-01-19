@@ -1,4 +1,4 @@
-# AI-Practices 项目路线图
+﻿# AI-Practices 项目路线图
 
 > **最后更新**: 2026-01-19 | **当前阶段**: Phase 10 - 前沿技术与工程卓越
 
@@ -331,6 +331,33 @@ test(agents): 添加多智能体协作测试
 - `FlashAttentionV1/V2/V3`: 三个版本完整实现
 
 **P0 里程碑已全部完成：** Mamba ✅ | MoE ✅ | Ring Attention ✅ | Flash Attention 3 ✅
+
+---
+
+## 最新进展 (2026-01-19)
+
+### 已完成：04-unified-models 4M 模型实现
+
+对 11-multimodal-learning/04-unified-models 新增 4M (Massively Multimodal Masked Modeling) 实现：
+
+| 文件 | 行数 | 功能 |
+|------|------|------|
+| fourm.py | ~1050 | 4M 完整实现：VQ-VAE、ModalityTokenizer、Transformer 编解码器 |
+| test_fourm.py | ~506 | 39 个单元测试，覆盖所有核心组件 |
+| 03_FourM_tutorial.ipynb | 25 cells | 交互式教程：向量量化、多模态分词、模态转换 |
+| 知识点.md | ~200 行 | 技术文档：架构详解、数学公式、使用示例 |
+
+**核心组件：**
+- VectorQuantizer - EMA 向量量化器，支持 codebook 更新
+- VQVAEEncoder/Decoder - CNN 编解码器，4x 下采样
+- ModalityTokenizer - 多模态统一分词（RGB/Depth/Normal/Semantic）
+- FourMEncoder/Decoder - Transformer 编解码器，支持 masked modeling
+- FourM - 完整模型，支持任意模态到任意模态生成
+
+**测试覆盖：**
+- 39 tests 全部通过 ✅
+- ruff lint 检查通过 ✅
+- 支持 tiny/small/base 三种模型规模
 
 ---
 
