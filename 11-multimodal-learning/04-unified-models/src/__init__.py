@@ -1,5 +1,21 @@
-"""统一模型导出"""
+﻿"""统一模型导出"""
 
+from .fourm import (
+    FourM,
+    FourMConfig,
+    FourMDecoder,
+    FourMDecoderLayer,
+    FourMEncoder,
+    FourMEncoderLayer,
+    FourMLoss,
+    FeedForward,
+    ModalityTokenizer,
+    MultiHeadAttention,
+    VQVAEDecoder,
+    VQVAEEncoder,
+    VectorQuantizer,
+    create_fourm_model,
+)
 from .imagebind import (
     AudioEncoder,
     DepthEncoder,
@@ -24,6 +40,21 @@ from .unified_io import (
 )
 
 __all__ = [
+    # 4M
+    "FourM",
+    "FourMConfig",
+    "FourMDecoder",
+    "FourMDecoderLayer",
+    "FourMEncoder",
+    "FourMEncoderLayer",
+    "FourMLoss",
+    "FeedForward",
+    "ModalityTokenizer",
+    "MultiHeadAttention",
+    "VQVAEDecoder",
+    "VQVAEEncoder",
+    "VectorQuantizer",
+    "create_fourm_model",
     # Unified-IO
     "UnifiedIO",
     "UnifiedIOConfig",
