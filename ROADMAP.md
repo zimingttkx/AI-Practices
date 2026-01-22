@@ -1,6 +1,6 @@
 ﻿# AI-Practices 项目路线图
 
-> **最后更新**: 2026-01-19 | **当前阶段**: Phase 10 - 前沿技术与工程卓越
+> **最后更新**: 2026-01-22 | **当前阶段**: Phase 10 - 前沿技术与工程卓越
 
 ---
 
@@ -259,6 +259,48 @@ test(agents): 添加多智能体协作测试
 
 # 未来开发计划
 
+## 最新进展 (2026-01-22)
+
+### 已完成：05-video-understanding Video-LLaVA 实现 (P1 里程碑完成)
+
+对 `11-multimodal-learning/05-video-understanding` 新增视频理解模型实现：
+
+| 文件 | 行数 | 功能 |
+|------|------|------|
+| video_llava.py | ~1090 | Video-LLaVA 完整实现 |
+| test_video_llava.py | ~660 | 55 个单元测试 (54 passed, 1 skipped) |
+| 知识点.md | ~350 | 技术文档 |
+| 01_VideoLLaVA_tutorial.ipynb | 25 cells | 交互式教程 |
+
+**核心组件：**
+- `VideoLLaVAConfig`: 模型配置 (视觉/时序/语言模型参数)
+- `VisionEncoder`: ViT 视觉编码器 (Patch Embedding + Transformer)
+- `TemporalTransformer`: 时序 Transformer (跨帧注意力)
+- `TemporalLSTM`: 时序 LSTM (顺序建模)
+- `TemporalPooling`: 时序池化 (Mean/Max/Attention)
+- `VideoProjector`: 视觉到语言空间投影 (Linear/MLP)
+- `LLaMAModel`: LLaMA 风格语言模型 (RMSNorm/RoPE/SwiGLU)
+- `VideoProcessor`: 视频预处理 (帧采样/大小调整)
+- `create_video_llava()`: 工厂函数 (tiny/base/large)
+
+**模块结构：**
+```
+11-multimodal-learning/05-video-understanding/
+├── src/
+│   ├── __init__.py
+│   └── video_llava.py          # Video-LLaVA 实现
+├── tests/
+│   ├── __init__.py
+│   └── test_video_llava.py     # 55 tests
+├── notebooks/
+│   └── 01_VideoLLaVA_tutorial.ipynb
+└── 知识点.md                    # 技术文档
+```
+
+**P1 里程碑已全部完成：** Unified-IO 2 ✅ | ImageBind ✅ | 4M ✅ | Video-LLaVA ✅
+
+---
+
 ## 最新进展 (2026-01-19)
 
 ### 已完成：04-unified-models Unified-IO 2 实现 (P1 里程碑开始)
@@ -461,8 +503,8 @@ test(agents): 添加多智能体协作测试
 |:-----|:-----|:---------|:---------|:-----|
 | Unified-IO 2 | `11-multimodal/04-unified-models/unified_io.py` | ~430 | 任意模态输入输出、统一 tokenizer | ✅ 已完成 |
 | ImageBind | `11-multimodal/04-unified-models/imagebind.py` | ~770 | 6 模态对齐、跨模态检索 | ✅ 已完成 |
-| 4M (Massively Multimodal) | `11-multimodal/04-unified-models/4m.py` | ~800 | 任意到任意生成、模态 token 化 | 🚧 待开发 |
-| Video-LLaVA | `11-multimodal/05-video-understanding/video_llava.py` | ~750 | 视频理解、时序建模 | 🚧 待开发 |
+| 4M (Massively Multimodal) | `11-multimodal/04-unified-models/fourm.py` | ~1050 | 任意到任意生成、模态 token 化 | ✅ 已完成 |
+| Video-LLaVA | `11-multimodal/05-video-understanding/video_llava.py` | ~1090 | 视频理解、时序建模 | ✅ 已完成 |
 
 **优先级 P2 - 高效推理与部署：** ✅ **已完成 (2026-01-16)**
 
