@@ -1,6 +1,6 @@
 ﻿# AI-Practices 项目路线图
 
-> **最后更新**: 2026-01-22 | **当前阶段**: Phase 10 - 前沿技术与工程卓越
+> **最后更新**: 2026-01-23 | **当前阶段**: Phase 11 - 智能体与自主系统
 
 ---
 
@@ -551,16 +551,16 @@ test(agents): 添加多智能体协作测试
 
 ---
 
-#### Phase 11: 智能体与自主系统 (规划中)
+#### Phase 11: 智能体与自主系统 (进行中)
 
 **优先级 P0 - 高级 Agent 能力：**
 
-| 任务 | 文件 | 预计行数 | 核心技术 |
-|:-----|:-----|:---------|:---------|
-| Computer Use Agent | `14-agents/07-computer-use/computer_agent.py` | ~800 | 屏幕理解、GUI 操作、任务自动化 |
-| Code Agent | `14-agents/07-computer-use/code_agent.py` | ~700 | 代码生成、调试、重构 |
-| Browser Agent | `14-agents/08-web-agents/browser_agent.py` | ~650 | 网页导航、表单填写、信息提取 |
-| API Agent | `14-agents/08-web-agents/api_agent.py` | ~500 | API 发现、调用链、错误恢复 |
+| 任务 | 文件 | 预计行数 | 核心技术 | 状态 |
+|:-----|:-----|:---------|:---------|:-----|
+| Computer Use Agent | `14-agents-reasoning/07-computer-use/src/computer_agent.py` | ~800 | 屏幕理解、GUI 操作、任务自动化 | ✅ 完成 |
+| Code Agent | `14-agents-reasoning/07-computer-use/src/code_agent.py` | ~900 | 代码生成、调试、重构 | ✅ 完成 |
+| Browser Agent | `14-agents-reasoning/08-web-agents/src/browser_agent.py` | ~930 | 网页导航、表单填写、信息提取 | ✅ 完成 |
+| API Agent | `14-agents-reasoning/08-web-agents/src/api_agent.py` | ~750 | API 发现、调用链、错误恢复 | ✅ 完成 |
 
 **优先级 P1 - Agent 基础设施：**
 
