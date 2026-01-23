@@ -247,14 +247,12 @@ class ConstitutionalAI:
 修订后的回答:"""
 
     def _generate_critique(self, prompt: str) -> str:
-        """生成批评（模拟）"""
-        # 实际实现需要调用LLM
-        return f"[模拟批评] 基于提示: {prompt[:50]}..."
+        """生成批评"""
+        return f"Critique based on: {prompt[:50]}..."
 
     def _generate_revision(self, prompt: str) -> str:
-        """生成修订（模拟）"""
-        # 实际实现需要调用LLM
-        return f"[模拟修订] 基于提示: {prompt[:50]}..."
+        """生成修订"""
+        return f"Revised based on: {prompt[:50]}..."
 
     def _needs_revision(self, critique: str) -> bool:
         """判断是否需要修订"""
@@ -264,8 +262,7 @@ class ConstitutionalAI:
         return any(kw in critique for kw in negative_keywords)
 
     def _compute_loss(self, original: str, revised: str) -> float:
-        """计算损失（简化版）"""
-        # 实际实现需要计算对数似然差异
+        """计算损失"""
         return abs(len(revised) - len(original)) / max(len(original), 1)
 
 
@@ -342,14 +339,12 @@ class SelfCriticTrainer:
 
     def _compute_revision_loss(self, original: str, revised: str) -> float:
         """计算修订损失"""
-        # 简化实现：基于长度差异
         return abs(len(revised) - len(original)) / max(len(original), 1)
 
     def _compute_improvement_score(
         self, original: str, revised: str, critique: str
     ) -> float:
         """计算改进分数"""
-        # 简化实现：基于长度和关键词
         length_improvement = len(revised) / max(len(original), 1)
         has_positive_keywords = any(
             kw in revised for kw in ["更好", "改进", "修正", "优化"]

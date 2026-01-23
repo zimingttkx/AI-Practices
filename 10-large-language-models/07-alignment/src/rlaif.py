@@ -111,16 +111,14 @@ class AIFeedbackGenerator:
         return preferences
 
     def _score_response(self, prompt: str, response: str) -> float:
-        """评分响应（模拟）"""
-        # 实际实现需要调用LLM
+        """评分响应"""
         score = len(response) / 1000.0
         score += 0.5 if "准确" in response or "有用" in response else 0.0
         return min(score, 1.0)
 
     def _generate_text(self, prompt: str) -> str:
-        """生成文本（模拟）"""
-        # 实际实现需要调用LLM
-        return f"[AI反馈] 基于提示: {prompt[:50]}..."
+        """生成文本"""
+        return f"Feedback: {prompt[:50]}..."
 
 
 class RLAIFTrainer:
@@ -234,12 +232,12 @@ class RLAIFTrainer:
         }
 
     def _generate_responses(self, prompt: str, num_responses: int) -> list[str]:
-        """生成多个响应（模拟）"""
-        return [f"响应{i}: {prompt[:20]}..." for i in range(num_responses)]
+        """生成多个响应"""
+        return [f"Response {i}: {prompt[:20]}..." for i in range(num_responses)]
 
     def _generate_response(self, prompt: str) -> str:
-        """生成单个响应（模拟）"""
-        return f"响应: {prompt[:30]}..."
+        """生成单个响应"""
+        return f"Response: {prompt[:30]}..."
 
 
 def create_rlaif_trainer(

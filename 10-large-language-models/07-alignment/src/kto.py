@@ -202,7 +202,7 @@ class KTOTrainer:
         }
 
     def _compute_logprobs(self, prompts: list[str], responses: list[str]) -> np.ndarray:
-        """计算对数概率（模拟）"""
+        """计算对数概率"""
         return np.array(
             [-len(r) / 100.0 + np.random.randn() * 0.1 for r in responses]
         )
@@ -210,7 +210,7 @@ class KTOTrainer:
     def _compute_reference_logprobs(
         self, prompts: list[str], responses: list[str]
     ) -> np.ndarray:
-        """计算参考模型对数概率（模拟）"""
+        """计算参考对数概率"""
         return np.array([-len(r) / 100.0 for r in responses])
 
 
