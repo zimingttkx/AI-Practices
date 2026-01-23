@@ -1,14 +1,6 @@
-# AI-Practices Docker Compose Configuration
-# Usage:
-#   docker-compose up dev        - Development environment
-#   docker-compose up jupyter    - Jupyter Lab server
-#   docker-compose up test       - Run tests
-#   docker-compose build         - Build all images
-
 version: '3.8'
 
 services:
-  # Development environment with all tools
   dev:
     build:
       context: .
@@ -25,7 +17,6 @@ services:
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
 
-  # Jupyter Lab server
   jupyter:
     build:
       context: .
@@ -41,7 +32,6 @@ services:
       - JUPYTER_ENABLE_LAB=yes
       - PYTHONPATH=/app
 
-  # Test runner
   test:
     build:
       context: .
@@ -54,7 +44,6 @@ services:
       - PYTHONPATH=/app
       - PYTEST_ADDOPTS=-v --tb=short
 
-  # Production-like environment
   prod:
     build:
       context: .
