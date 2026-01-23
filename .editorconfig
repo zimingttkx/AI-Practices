@@ -1,9 +1,8 @@
-# EditorConfig helps maintain consistent coding styles
+# EditorConfig configuration
 # https://editorconfig.org
 
 root = true
 
-# Default settings for all files
 [*]
 charset = utf-8
 end_of_line = lf
@@ -12,37 +11,36 @@ indent_size = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-# Python files
 [*.py]
 indent_size = 4
-max_line_length = 88
+max_line_length = 100
 
-# JavaScript/TypeScript
-[*.{js,ts,mjs,mts}]
+[*.{js,ts,jsx,tsx,mjs,mts,cjs,cts}]
 indent_size = 2
 
-# JSON files
-[*.json]
+[*.{json,jsonc}]
 indent_size = 2
 
-# YAML files
 [*.{yml,yaml}]
 indent_size = 2
 
-# Markdown files
 [*.md]
 trim_trailing_whitespace = false
 max_line_length = off
 
-# Jupyter notebooks (JSON format)
-[*.ipynb]
+[*.{ipynb}]
 indent_size = 1
 insert_final_newline = false
 
-# Shell scripts
 [*.sh]
 indent_size = 2
+end_of_line = lf
 
-# Makefile
 [Makefile]
 indent_style = tab
+
+[*.{toml,ini,cfg}]
+indent_size = 4
+
+[*.{html,css,scss}]
+indent_size = 2

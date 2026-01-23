@@ -1,9 +1,5 @@
-# Dependabot configuration file
-# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-
 version: 2
 updates:
-  # Maintain dependencies for npm (VitePress documentation)
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -20,7 +16,6 @@ updates:
     reviewers:
       - "zimingttkx"
 
-  # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -37,7 +32,6 @@ updates:
     reviewers:
       - "zimingttkx"
 
-  # Maintain dependencies for pip (Python packages)
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
@@ -53,7 +47,6 @@ updates:
       - "python"
     reviewers:
       - "zimingttkx"
-    # Group minor and patch updates together
     groups:
       ml-frameworks:
         patterns:

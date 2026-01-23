@@ -25,7 +25,7 @@ jobs:
     name: Code Quality
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -34,15 +34,15 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
 
-      - name: Install linting tools
+      - name: Install tools
         run: |
           python -m pip install --upgrade pip
           pip install ruff black
 
-      - name: Run Ruff linter
+      - name: Ruff check
         run: ruff check . --output-format=github || true
 
-      - name: Check Black formatting
+      - name: Black check
         run: black --check --diff . || true
 
   test:
@@ -54,7 +54,7 @@ jobs:
         python-version: ['3.9', '3.10', '3.11']
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Python ${{ matrix.python-version }}
@@ -85,7 +85,7 @@ jobs:
             --ignore=10-large-language-models/07-alignment/tests/ \
             -x || true
 
-      - name: Generate coverage report
+      - name: Coverage report
         if: matrix.python-version == '3.10'
         run: |
           pytest --cov=. --cov-report=xml --cov-report=term-missing \
@@ -93,16 +93,16 @@ jobs:
             07-reinforcement-learning/03-q-learning/src/tests/ \
             -q || true
 
-  test-summary:
+  summary:
     name: Test Summary
     needs: [lint, test]
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Check test results
+      - name: Results
         run: |
-          echo "Lint status: ${{ needs.lint.result }}"
-          echo "Test status: ${{ needs.test.result }}"
+          echo "Lint: ${{ needs.lint.result }}"
+          echo "Test: ${{ needs.test.result }}"
           if [[ "${{ needs.test.result }}" == "failure" ]]; then
-            echo "::warning::Some tests failed, please check the logs"
+            echo "::warning::Some tests failed"
           fi
