@@ -573,16 +573,16 @@ test(agents): 添加多智能体协作测试
 
 ---
 
-#### Phase 12: 对齐与安全 (规划中)
+#### Phase 12: 对齐与安全 (进行中)
 
-**优先级 P0 - 对齐技术：**
+**优先级 P0 - 对齐技术：** ✅ **已完成 (2026-01-23)**
 
-| 任务 | 文件 | 预计行数 | 核心技术 |
-|:-----|:-----|:---------|:---------|
-| Constitutional AI | `10-llm/07-alignment/constitutional.py` | ~600 | 自我批评、原则引导 |
-| RLAIF | `10-llm/07-alignment/rlaif.py` | ~550 | AI 反馈、无人工标注 |
-| KTO | `10-llm/07-alignment/kto.py` | ~400 | Kahneman-Tversky 优化 |
-| ORPO | `10-llm/07-alignment/orpo.py` | ~400 | 无参考模型对齐 |
+| 任务 | 文件 | 实际行数 | 核心技术 | 状态 |
+|:-----|:-----|:---------|:---------|:-----|
+| Constitutional AI | `10-llm/07-alignment/constitutional.py` | ~450 | 自我批评、原则引导 | ✅ 完成 (21 tests) |
+| RLAIF | `10-llm/07-alignment/rlaif.py` | ~250 | AI 反馈、无人工标注 | ✅ 完成 (17 tests) |
+| KTO | `10-llm/07-alignment/kto.py` | ~230 | Kahneman-Tversky 优化 | ✅ 完成 (15 tests) |
+| ORPO | `10-llm/07-alignment/orpo.py` | ~180 | 无参考模型对齐 | ✅ 完成 (14 tests) |
 
 **优先级 P1 - 安全与可解释性：**
 
