@@ -45,6 +45,39 @@ from .dpo import (
     compute_reference_logprobs,
 )
 
+from .constitutional import (
+    ConstitutionalAI,
+    ConstitutionalBatch,
+    ConstitutionalConfig,
+    ConstitutionalPrinciple,
+    RevisionBatch,
+    SelfCriticTrainer,
+    create_constitutional_ai,
+)
+
+from .rlaif import (
+    RLAIFConfig,
+    AIFeedbackGenerator,
+    RLAIFTrainer,
+    create_rlaif_trainer,
+)
+
+from .kto import (
+    KTOConfig,
+    KTOLoss,
+    KTOTrainer,
+    KTOBatch,
+    create_kto_trainer,
+)
+
+from .orpo import (
+    ORPOConfig,
+    ORPOLoss,
+    ORPOTrainer,
+    PreferenceBatch,
+    create_orpo_trainer,
+)
+
 
 __all__ = [
     # Reward Model
@@ -67,4 +100,29 @@ __all__ = [
     "PreferenceDataCollator",
     "compute_dpo_loss",
     "compute_reference_logprobs",
+    # Constitutional AI
+    "ConstitutionalAI",
+    "ConstitutionalBatch",
+    "ConstitutionalConfig",
+    "ConstitutionalPrinciple",
+    "RevisionBatch",
+    "SelfCriticTrainer",
+    "create_constitutional_ai",
+    # RLAIF
+    "RLAIFConfig",
+    "AIFeedbackGenerator",
+    "RLAIFTrainer",
+    "create_rlaif_trainer",
+    # KTO
+    "KTOConfig",
+    "KTOLoss",
+    "KTOTrainer",
+    "KTOBatch",
+    "create_kto_trainer",
+    # ORPO
+    "ORPOConfig",
+    "ORPOLoss",
+    "ORPOTrainer",
+    "PreferenceBatch",
+    "create_orpo_trainer",
 ]
