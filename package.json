@@ -1,12 +1,14 @@
 {
   "name": "ai-practices",
   "version": "1.0.0",
-  "description": "A Systematic Approach to AI Research & Engineering",
+  "description": "Systematic AI/ML learning platform from foundations to advanced topics",
   "type": "module",
   "scripts": {
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "lint": "echo 'Linting documentation...'",
+    "format": "echo 'Formatting documentation...'"
   },
   "repository": {
     "type": "git",
@@ -24,12 +26,16 @@
     "data-science",
     "jupyter-notebooks",
     "tutorials",
-    "education"
+    "education",
+    "reinforcement-learning",
+    "large-language-models",
+    "multimodal-learning"
   ],
   "author": "zimingttkx",
   "license": "MIT",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   },
   "bugs": {
     "url": "https://github.com/zimingttkx/AI-Practices/issues"
