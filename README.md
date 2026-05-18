@@ -9,8 +9,8 @@
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.13+-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://tensorflow.org)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](./LICENSE)
 
-[![Stars](https://img.shields.io/github/stars/zimingttkx/AI-Practices?style=for-the-badge&logo=github&color=yellow)](https://github.com/zimingttkx/AI-Practices/stargazers)
-[![Forks](https://img.shields.io/github/forks/zimingttkx/AI-Practices?style=for-the-badge&logo=github&color=blue)](https://github.com/zimingttkx/AI-Practices/network/members)
+[![星标](https://img.shields.io/github/stars/zimingttkx/AI-Practices?style=for-the-badge&logo=github&color=yellow)](https://github.com/zimingttkx/AI-Practices/stargazers)
+[![复刻](https://img.shields.io/github/forks/zimingttkx/AI-Practices?style=for-the-badge&logo=github&color=blue)](https://github.com/zimingttkx/AI-Practices/network/members)
 
 **[English](./README_EN.md)** | **[快速开始](#-快速开始)** | **[项目路线图](./ROADMAP.md)**
 
@@ -370,6 +370,12 @@ jupyter lab
 ## 许可证
 
 本项目采用 **MIT License** 开源协议 - 详见 [LICENSE](LICENSE)
+
+---
+
+---
+
+https://www.star-history.com/?repos=quantumflow%2Fquantumflow%2Czimingttkx%2FAI-Practices&type=date&legend=top-left
 
 ---
 
