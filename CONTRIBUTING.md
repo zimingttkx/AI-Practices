@@ -40,13 +40,37 @@ Thank you for your interest in contributing to AI-Practices!
 #### Python Code
 - Follow [PEP 8](https://pep8.org/)
 - Use meaningful names
-- Add docstrings
+- Add **bilingual docstrings** (Chinese first line, then English; see below)
 - Keep functions modular
+- Add `from __future__ import annotations` at the top of every `.py` file
+- Use `logging` instead of `print()` in library code
+
+#### Docstring Convention (Bilingual)
+
+All docstrings should follow this bilingual format:
+
+```python
+def train_epoch(model, dataloader, criterion, optimizer):
+    """训练一个 epoch。/ Train for one epoch.
+
+    执行单轮前向传播、损失计算、反向传播和参数更新。
+
+    Args:
+        model: 待训练的 PyTorch 模型 / PyTorch model to train
+        dataloader: 训练数据加载器 / training data loader
+        criterion: 损失函数 / loss function
+        optimizer: 优化器 / optimizer
+
+    Returns:
+        float: 平均损失 / average loss
+    """
+```
 
 #### Jupyter Notebooks
 - Clear outputs before committing
 - Include markdown explanations
 - Use consistent structure
+- For TF→PyTorch dual versions, use `_pytorch` suffix (e.g., `01-LinearRegression_pytorch.ipynb`)
 
 #### Commit Messages
 - Format: `type(scope): description`
@@ -59,11 +83,25 @@ fix(nlp): correct tokenization in BERT
 docs(readme): update installation
 ```
 
+### CI/CD Requirements
+
+All pull requests must pass the CI pipeline:
+
+1. **Lint checks**: `ruff check .` and `black --check .` must pass
+2. **Tests**: `pytest` on Python 3.9, 3.10, 3.11 must pass
+3. **Pre-commit hooks**: Install and run before pushing:
+   ```bash
+   pip install pre-commit
+   pre-commit install
+   pre-commit run --all-files
+   ```
+
 ### Pull Request Process
 
 1. **Before submitting**
    - Follow style guidelines
-   - Test locally
+   - Run pre-commit hooks locally
+   - Run tests locally: `pytest`
    - Update documentation
    - Rebase on latest `main`
 
@@ -120,13 +158,16 @@ docs(readme): update installation
 #### Python 代码
 - 遵循 [PEP 8](https://pep8.org/)
 - 使用有意义的命名
-- 添加文档字符串
+- 添加**中英双语文档字符串**（中文首行，英文次行；见英文部分示例）
 - 保持函数模块化
+- 每个 `.py` 文件顶部添加 `from __future__ import annotations`
+- 库代码中使用 `logging` 替代 `print()`
 
 #### Jupyter Notebooks
 - 提交前清除输出
 - 包含 markdown 说明
 - 使用一致的结构
+- TF→PyTorch 双版本使用 `_pytorch` 后缀（如 `01-LinearRegression_pytorch.ipynb`）
 
 #### 提交信息
 - 格式：`type(scope): description`
@@ -139,11 +180,25 @@ fix(nlp): 修正 BERT 分词问题
 docs(readme): 更新安装说明
 ```
 
+### CI/CD 要求
+
+所有 Pull Request 必须通过 CI 流水线：
+
+1. **Lint 检查**：`ruff check .` 和 `black --check .` 必须通过
+2. **测试**：Python 3.9、3.10、3.11 上的 `pytest` 必须通过
+3. **Pre-commit 钩子**：推送前安装并运行：
+   ```bash
+   pip install pre-commit
+   pre-commit install
+   pre-commit run --all-files
+   ```
+
 ### Pull Request 流程
 
 1. **提交前**
    - 遵循风格指南
-   - 本地测试
+   - 本地运行 pre-commit 钩子
+   - 本地运行测试：`pytest`
    - 更新文档
    - 在最新 `main` 上 rebase
 

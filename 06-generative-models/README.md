@@ -4,6 +4,14 @@
 
 ---
 
+## 前置知识
+
+- ✅ 必需：深度学习基础、概率论
+- 📖 推荐：变分推断、信息论基础
+- 🔗 前序模块：[02-neural-networks](../02-neural-networks)、[05-advanced-topics](../05-advanced-topics)
+
+---
+
 ## 目录结构
 
 ```

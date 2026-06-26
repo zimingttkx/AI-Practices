@@ -1,5 +1,11 @@
 # 大语言模型 (Large Language Models)
 
+## 前置知识
+
+- ✅ 必需：深度学习基础、PyTorch、Transformer 架构
+- 📖 推荐：自然语言处理基础、注意力机制原理
+- 🔗 前序模块：[04-sequence-models](../04-sequence-models)、[02-neural-networks](../02-neural-networks)
+
 ## 概述
 
 从基础理论到前沿技术，涵盖 Transformer 架构、预训练、微调、对齐和部署。

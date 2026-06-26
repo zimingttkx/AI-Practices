@@ -4,6 +4,14 @@
 
 ---
 
+## 前置知识
+
+- ✅ 必需：深度学习基础、CNN/RNN 经验
+- 📖 推荐：模型优化理论、分布式计算概念
+- 🔗 前序模块：[03-computer-vision](../03-computer-vision)、[04-sequence-models](../04-sequence-models)
+
+---
+
 ## 目录结构
 
 ```

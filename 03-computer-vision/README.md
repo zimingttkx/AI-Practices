@@ -4,6 +4,14 @@
 
 ---
 
+## 前置知识
+
+- ✅ 必需：Python、NumPy、深度学习基础（神经网络、反向传播）
+- 📖 推荐：线性代数（卷积运算）、概率论
+- 🔗 前序模块：[01-foundations](../01-foundations)、[02-neural-networks](../02-neural-networks)
+
+---
+
 ## 目录结构
 
 ```

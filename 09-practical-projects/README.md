@@ -4,6 +4,12 @@
 
 ---
 
+## 前置知识
+
+- ✅ 必需：Python、scikit-learn 或 PyTorch 基础
+- 📖 推荐：对应项目领域的专业知识
+- 🔗 前序模块：[01-foundations](../01-foundations) 到 [06-generative-models](../06-generative-models)
+
 ## 目录结构
 
 ```
@@ -101,7 +107,7 @@ project-name/
 
 ---
 
-[返回主页](../README.md) | [项目实施指南](../docs/guides/PROJECTS_GUIDE.md)
+[返回主页](../README.md) | [项目架构指南](../docs/zh/guide/architecture.md)
 
 ---
 
