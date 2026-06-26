@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-21T06:53:24.132451",
+  "timestamp": "2026-06-26T08:15:05.632085",
   "modules": {
     "01-foundations": {
       "notebooks": 42,
@@ -8,10 +8,10 @@
       "lines_of_code": 0
     },
     "02-neural-networks": {
-      "notebooks": 26,
-      "python_files": 0,
-      "markdown_files": 7,
-      "lines_of_code": 0
+      "notebooks": 46,
+      "python_files": 7,
+      "markdown_files": 8,
+      "lines_of_code": 805
     },
     "03-computer-vision": {
       "notebooks": 11,
@@ -57,9 +57,9 @@
     }
   },
   "totals": {
-    "notebooks": 233,
-    "python_files": 434,
-    "markdown_files": 113,
-    "lines_of_code": 142274
+    "notebooks": 253,
+    "python_files": 441,
+    "markdown_files": 114,
+    "lines_of_code": 143079
   }
 }
