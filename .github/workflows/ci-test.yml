@@ -40,10 +40,10 @@ jobs:
           pip install ruff black
 
       - name: Ruff check
-        run: ruff check . --output-format=github || true
+        run: ruff check . --output-format=github
 
       - name: Black check
-        run: black --check --diff . || true
+        run: black --check --diff .
 
   test:
     name: Tests (Python ${{ matrix.python-version }})
@@ -80,10 +80,12 @@ jobs:
             11-multimodal-learning/*/tests/ \
             12-deployment-optimization/*/tests/ \
             13-distributed-training/*/tests/ \
+            14-agents-reasoning/*/tests/ \
             --ignore=10-large-language-models/05-rag/tests/ \
             --ignore=10-large-language-models/06-agents/tests/ \
             --ignore=10-large-language-models/07-alignment/tests/ \
-            -x || true
+            --ignore=14-agents-reasoning/02-reasoning/tests/ \
+            -x
 
       - name: Coverage report
         if: matrix.python-version == '3.10'
@@ -91,7 +93,7 @@ jobs:
           pytest --cov=. --cov-report=xml --cov-report=term-missing \
             07-reinforcement-learning/02-temporal-difference/src/tests/ \
             07-reinforcement-learning/03-q-learning/src/tests/ \
-            -q || true
+            -q
 
   summary:
     name: Test Summary
@@ -103,6 +105,9 @@ jobs:
         run: |
           echo "Lint: ${{ needs.lint.result }}"
           echo "Test: ${{ needs.test.result }}"
+          if [[ "${{ needs.lint.result }}" == "failure" ]]; then
+            echo "::error::Lint checks failed - see lint job for details"
+          fi
           if [[ "${{ needs.test.result }}" == "failure" ]]; then
-            echo "::warning::Some tests failed"
+            echo "::error::Some tests failed - see test job for details"
           fi
